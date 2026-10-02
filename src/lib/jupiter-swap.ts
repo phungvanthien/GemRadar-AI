@@ -19,8 +19,10 @@ import {
 } from "./trade-wallet";
 import { getTradeConfig, type TradeConfig } from "./trade-config";
 
-const QUOTE_URL = "https://quote-api.jup.ag/v6/quote";
-const SWAP_URL = "https://quote-api.jup.ag/v6/swap";
+// Jupiter retired the quote-api.jup.ag/v6 host; the current free endpoint is
+// lite-api.jup.ag/swap/v1 (same request/response shape).
+const QUOTE_URL = "https://lite-api.jup.ag/swap/v1/quote";
+const SWAP_URL = "https://lite-api.jup.ag/swap/v1/swap";
 const WSOL_MINT = "So11111111111111111111111111111111111111112";
 const LAMPORTS_PER_SOL = 1_000_000_000;
 const QUOTE_TIMEOUT_MS = 10_000;

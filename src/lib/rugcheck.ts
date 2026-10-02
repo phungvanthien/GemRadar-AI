@@ -363,17 +363,23 @@ export async function getRugcheckReportBulk(
   });
   if (!raw) return out;
 
-  // As with the bulk summary, RugCheck may return a { mint: report } map or an
-  // array of reports carrying their own mint field. Handle both.
-  if (Array.isArray(raw)) {
-    for (const entry of raw as Array<RawReport & { mint?: string; address?: string }>) {
+  // RugCheck's /bulk/tokens/report wraps the array in a { reports: [...] }
+  // envelope. Older/other endpoints return a bare array or a { mint: report }
+  // map. Unwrap the envelope first, then handle both remaining shapes.
+  const payload =
+    typeof raw === "object" && raw !== null && Array.isArray((raw as { reports?: unknown }).reports)
+      ? (raw as { reports: unknown[] }).reports
+      : raw;
+
+  if (Array.isArray(payload)) {
+    for (const entry of payload as Array<RawReport & { mint?: string; address?: string }>) {
       const mint = entry.mint ?? entry.address;
       if (!mint) continue;
       const report = normalizeReport(mint, entry);
       if (report) out.set(mint, report);
     }
-  } else if (typeof raw === "object" && raw !== null) {
-    for (const [mint, value] of Object.entries(raw as Record<string, RawReport>)) {
+  } else if (typeof payload === "object" && payload !== null) {
+    for (const [mint, value] of Object.entries(payload as Record<string, RawReport>)) {
       const report = normalizeReport(mint, value);
       if (report) out.set(mint, report);
     }
