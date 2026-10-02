@@ -1,0 +1,75 @@
+{
+  "$schema": "./social-monitor.schema.json",
+  "_comment": "Behavior config for social monitoring of high-scoring gems. NO SECRETS here — API credentials/tokens live in .env.local (see .env.example). Safe to commit.",
+
+  "thresholds": {
+    "_comment": "A gem is tracked on social only when BOTH thresholds are met (AND).",
+    "minGemScoreAi": 7,
+    "minGemScoreTotal": 70,
+    "minCoverage": 0.7
+  },
+
+  "telegram": {
+    "enabled": true,
+    "_comment": "Worker joins project Telegram channels read-only. Credentials come from TELEGRAM_* in .env.local. USE A SECONDARY PHONE — see scripts/tg-worker/README.md.",
+    "maxJoinsPerRun": 3,
+    "minJoinDelaySeconds": 45,
+    "maxJoinDelaySeconds": 120,
+    "historySampleSize": 100,
+    "leaveOnStatus": ["fail", "sold"],
+    "leaveAfterHoursIfBelowScore": 48,
+    "leaveScoreFloor": 30
+  },
+
+  "x": {
+    "enabled": true,
+    "_comment": "Twitter/X buzz monitoring via Nitter public RSS — no API key, no account needed. Set source='nitter' to use the free Nitter path (scripts/tg-worker/worker.py). Set source='official' to use the paid X API v2 (needs X_BEARER_TOKEN in .env.local). Set source='none' to disable entirely.",
+    "source": "nitter",
+    "_source_options": "nitter = free Nitter RSS (default); official = X API v2 (needs X_BEARER_TOKEN); none = disabled",
+    "minFollowers": 500,
+    "maxAccountAgeDaysForCaution": 14,
+    "trackKeywords": ["solana", "meme", "gem"],
+    "pollIntervalMinutes": 60,
+    "maxAccountsPerRun": 10
+  },
+
+  "watchlist": {
+    "_comment": "How long to keep tracking and how many gems to track at once.",
+    "maxTrackedTokens": 50,
+    "trackTtlHours": 72
+  },
+
+  "spamFilter": {
+    "_comment": "Thresholds for the bot/spam filter in src/lib/spam-filter.ts. Scores below botThreshold are treated as spam and suppressed entirely. Scores above it are discounted proportionally by the authenticity score.",
+    "botThreshold": 30,
+    "telegram": {
+      "_comment": "Group-level bot detection thresholds. Signals are tallied from the historySampleSize messages the worker reads.",
+      "minOnlineRatioPct": 0.5,
+      "_minOnlineRatioPct_comment": "% of members that should be online (below this → ghost group penalty). Set to 0 to disable.",
+      "maxMsgRatePerMemberPerHour": 1.0,
+      "_maxMsgRatePerMemberPerHour_comment": "Messages/hour/member threshold above which the group is flagged as bot-inflated.",
+      "maxForwardedSharePct": 40,
+      "_maxForwardedSharePct_comment": "% of messages that are forwards before a penalty is applied.",
+      "maxAnonymousSharePct": 30,
+      "_maxAnonymousSharePct_comment": "% of messages from anonymous senders before a penalty is applied.",
+      "maxContractSharePct": 50,
+      "_maxContractSharePct_comment": "% of messages containing a contract address (contract dump channel detection).",
+      "minUniqueSenderRatioPct": 5,
+      "_minUniqueSenderRatioPct_comment": "% unique senders / total messages. Below this → concentrated bot activity."
+    },
+    "x": {
+      "_comment": "Account-level bot detection thresholds for X/Twitter signals.",
+      "maxFollowingFollowerRatio": 20,
+      "_maxFollowingFollowerRatio_comment": "Following/follower ratio above this → follow-back bot pattern.",
+      "minAvgEngagementForActive": 0.5,
+      "_minAvgEngagementForActive_comment": "Average engagement per tweet below this (with ≥10 tweets) → ghost/bot account.",
+      "maxTweetsPerDay": 100,
+      "_maxTweetsPerDay_comment": "Tweets/day above this → bot posting rate.",
+      "newAccountDaysHard": 7,
+      "_newAccountDaysHard_comment": "Accounts younger than this (days) get a hard penalty (-30 pts).",
+      "newAccountDaysSoft": 30,
+      "_newAccountDaysSoft_comment": "Accounts younger than this (days) get a soft penalty (-15 pts)."
+    }
+  }
+}
+

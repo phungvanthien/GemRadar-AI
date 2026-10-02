@@ -6,14 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "trade-worker": "node scripts/trade-worker/worker.mjs",
+    "sim-worker": "node scripts/sim-worker/worker.mjs",
+    "outcome-worker": "node scripts/outcome-worker/worker.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.129.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@solana/web3.js": "1.99.0",
+    "bs58": "6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.17.0",

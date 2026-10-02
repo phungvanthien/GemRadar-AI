@@ -1,0 +1,19 @@
+{
+  "name": "alphahunter-x-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Free X (Twitter) buzz scraper that feeds xScore into the AlphaHunter gem score",
+  "type": "commonjs",
+  "scripts": {
+    "scrape": "tsx twitter_scraper.ts",
+    "watch": "tsx twitter_scraper.ts --watch"
+  },
+  "dependencies": {
+    "playwright": "1.48.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}

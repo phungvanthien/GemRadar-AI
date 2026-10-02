@@ -40,3 +40,33 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Telegram social worker (scripts/tg-worker)
+# Session files hold login credentials — never commit them. Data files are
+# runtime state shared with the Next.js side.
+*.session
+*.session-journal
+scripts/tg-worker/.venv/
+scripts/tg-worker/watchlist.json
+scripts/social-scores.json
+__pycache__/
+*.pyc
+
+# X buzz worker (scripts/x-worker)
+# cookies.json holds a logged-in X session — treat like a credential, never
+# commit it. x-scores.json is runtime state shared with the Next.js side.
+scripts/x-worker/cookies.json
+scripts/x-worker/node_modules/
+scripts/x-scores.json
+
+# Automated trade execution — runtime state. positions holds live P&L and token
+# amounts; settings may hold trade config. Never commit either.
+alphahunter-positions.json
+alphahunter-settings.json
+# Capital mandate — entrusted-funds config + state. Runtime state, never commit.
+alphahunter-mandate.json
+alphahunter-mandate-audit.log
+# Outcome memory — AI gem-score predictions + realized outcomes. Runtime state.
+alphahunter-gem-outcomes.json
+# trade-worker temp compile dirs (created inside node_modules at runtime)
+node_modules/.trade-*

@@ -5,7 +5,7 @@ import {
   fetchListings,
   getTopMovers,
   getTrending,
-} from "@/lib/coinmarketcap";
+} from "@/lib/coingecko";
 
 export const dynamic = "force-dynamic";
 

@@ -1,6 +1,6 @@
 # AlphaHunter AI
 
-Production-ready crypto intelligence dashboard with AI chat, live market widgets, and a **Hidden Gems** scanner powered by CoinMarketCap + OpenAI.
+Production-ready crypto intelligence dashboard with AI chat, live market widgets, and a **Hidden Gems** scanner powered by CoinMarketCap + Claude (via FridayAIX).
 
 ![Next.js](https://img.shields.io/badge/Next.js-15%2B-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
@@ -23,7 +23,7 @@ Production-ready crypto intelligence dashboard with AI chat, live market widgets
 - TypeScript
 - Tailwind CSS v4
 - shadcn/ui-style components (Radix + CVA)
-- OpenAI SDK (`gpt-4o-mini`)
+- Anthropic SDK via [FridayAIX](https://oneai.fridayaix.com/) gateway (`claude-sonnet-4-6`)
 - CoinMarketCap Pro API
 - Alternative.me Fear & Greed (no key required)
 
@@ -46,7 +46,9 @@ cp .env.example .env.local
 
 | Variable | Description |
 |----------|-------------|
-| `OPENAI_API_KEY` | OpenAI API key |
+| `ANTHROPIC_BASE_URL` | FridayAIX gateway URL (`https://oneai.fridayaix.com/`) |
+| `ANTHROPIC_AUTH_TOKEN` | FridayAIX API key |
+| `ANTHROPIC_DEFAULT_SONNET_MODEL` | Chat/analysis model (defaults to `claude-sonnet-4-6`) |
 | `COINMARKETCAP_API_KEY` | [CoinMarketCap Pro](https://coinmarketcap.com/api/) API key |
 
 ### 3. Run locally
@@ -68,7 +70,7 @@ npm start
 
 1. Push this repo to GitHub.
 2. Import the project in [Vercel](https://vercel.com/new).
-3. Add `OPENAI_API_KEY` and `COINMARKETCAP_API_KEY` in **Project → Settings → Environment Variables**.
+3. Add `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, and `COINMARKETCAP_API_KEY` in **Project → Settings → Environment Variables**.
 4. Deploy.
 
 ## API Reference
@@ -85,7 +87,7 @@ npm start
 
 ### `POST /api/gems`
 
-Runs the hidden gem pipeline (CMC filter → OpenAI analysis). No body required.
+Runs the hidden gem pipeline (CMC filter → Claude analysis). No body required.
 
 ### `GET /api/market`
 
@@ -99,7 +101,7 @@ Returns BTC dominance, gainers, losers, trending, and Fear & Greed data.
 | 24h volume | &gt; $100,000 |
 | 24h change | Positive |
 
-Up to 15 candidates are sent to OpenAI for Gem Score, Risk Score, upside, and explanation.
+Up to 15 candidates are sent to Claude for Gem Score, Risk Score, upside, and explanation.
 
 ## Disclaimer
 

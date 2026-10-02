@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { filterHiddenGems, fetchListings } from "@/lib/coinmarketcap";
-import { analyzeGems } from "@/lib/openai";
+import { filterHiddenGems, fetchListings } from "@/lib/coingecko";
+import { analyzeGems } from "@/lib/ai";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;

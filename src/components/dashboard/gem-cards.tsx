@@ -9,18 +9,37 @@ import {
   BarChart3,
   DollarSign,
   Activity,
+  MessageCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatPercent } from "@/lib/utils";
-import type { GemAnalysis } from "@/lib/types";
+import type { SolanaGemAnalysis } from "@/lib/types";
+import type { GemScoreBreakdown } from "@/lib/gem-score";
+
+// A gem returned by /api/solana-gems: the AI analysis plus the deterministic
+// gem-score breakdown (null if scoring had no data for that mint).
+export interface ScoredGem extends SolanaGemAnalysis {
+  breakdown?: GemScoreBreakdown | null;
+}
+
+interface GemFailure {
+  mint: string;
+  reason: string;
+}
 
 interface GemCardsProps {
-  gems: GemAnalysis[];
+  gems: ScoredGem[];
   loading?: boolean;
   error?: string | null;
   emptyMessage?: string | null;
+  failures?: GemFailure[];
+  // Called when the user clicks "Ask AI" on a card — the parent injects a
+  // context-rich prompt about this gem into the chat.
+  onAskAI?: (gem: ScoredGem) => void;
+  // Disables the Ask AI buttons while a chat request is in flight.
+  askDisabled?: boolean;
 }
 
 function ScoreBar({ value, max = 10, color }: { value: number; max?: number; color: string }) {
@@ -75,13 +94,89 @@ function GemCardSkeleton() {
   );
 }
 
-function sortByGemScore(gems: GemAnalysis[]): GemAnalysis[] {
+function sortByGemScore(gems: ScoredGem[]): ScoredGem[] {
   return [...gems].sort((a, b) => b.gemScore - a.gemScore);
 }
 
-export function GemCards({ gems, loading, error, emptyMessage }: GemCardsProps) {
+const CATEGORY_META: { key: keyof Omit<GemScoreBreakdown, "total" | "coverage">; label: string }[] = [
+  { key: "security", label: "Security" },
+  { key: "liquidity", label: "Liquidity" },
+  { key: "moneyFlow", label: "Money Flow" },
+  { key: "distribution", label: "Distribution" },
+  { key: "social", label: "Social" },
+];
+
+function scoreColor(score: number): string {
+  if (score >= 70) return "bg-emerald-500";
+  if (score >= 40) return "bg-amber-500";
+  return "bg-red-500";
+}
+
+// Coverage badge: green >=90%, amber 60-89%, red <60%. A quick read of how much
+// of the model actually had data behind the score.
+function coverageBadge(coverage: number): { variant: "success" | "default" | "danger"; label: string } {
+  const pct = Math.round(coverage * 100);
+  if (pct >= 90) return { variant: "success", label: `${pct}% data` };
+  if (pct >= 60) return { variant: "default", label: `${pct}% data` };
+  return { variant: "danger", label: `${pct}% data` };
+}
+
+// The deterministic gem-score breakdown: four category bars + a coverage note so
+// the reader knows how much of the model actually had data behind it.
+function ScoreBreakdown({ breakdown }: { breakdown: GemScoreBreakdown }) {
+  return (
+    <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/40 p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          Gem Score {breakdown.total}
+          <span className="text-zinc-600">/100</span>
+        </span>
+        {(() => {
+          const b = coverageBadge(breakdown.coverage);
+          return (
+            <Badge variant={b.variant} className="text-[10px]">
+              {b.label}
+            </Badge>
+          );
+        })()}
+      </div>
+      <div className="space-y-1.5">
+        {CATEGORY_META.map(({ key, label }) => {
+          const cat = breakdown[key];
+          return (
+            <div key={key} className="flex items-center gap-2">
+              <span className="w-20 shrink-0 text-[11px] text-zinc-500">{label}</span>
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                {cat.covered ? (
+                  <div
+                    className={`h-full rounded-full transition-all ${scoreColor(cat.score)}`}
+                    style={{ width: `${cat.score}%` }}
+                  />
+                ) : null}
+              </div>
+              <span className="w-10 shrink-0 text-right text-[11px] tabular-nums text-zinc-400">
+                {cat.covered ? Math.round(cat.score) : "n/a"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export function GemCards({
+  gems,
+  loading,
+  error,
+  emptyMessage,
+  failures = [],
+  onAskAI,
+  askDisabled,
+}: GemCardsProps) {
   const sorted = sortByGemScore(gems);
-  const showSection = loading || !!error || sorted.length > 0 || !!emptyMessage;
+  const showSection =
+    loading || !!error || sorted.length > 0 || !!emptyMessage || failures.length > 0;
 
   if (!showSection) return null;
 
@@ -131,7 +226,7 @@ export function GemCards({ gems, loading, error, emptyMessage }: GemCardsProps) 
               <div>
                 <p className="text-sm font-medium text-zinc-200">Scanning for hidden gems</p>
                 <p className="text-xs text-zinc-500">
-                  Fetching CoinMarketCap data, applying filters, and running AI analysis…
+                  Reading recent Solana mints, on-chain + RugCheck + Jupiter signals, then AI analysis…
                 </p>
               </div>
             </CardContent>
@@ -224,6 +319,8 @@ export function GemCards({ gems, loading, error, emptyMessage }: GemCardsProps) 
                     </div>
                   </div>
 
+                  {gem.breakdown && <ScoreBreakdown breakdown={gem.breakdown} />}
+
                   <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/5 p-3">
                     <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-400">
                       <TrendingUp className="size-3.5" />
@@ -242,10 +339,22 @@ export function GemCards({ gems, loading, error, emptyMessage }: GemCardsProps) 
                     <p className="text-sm leading-relaxed text-zinc-400">{gem.explanation}</p>
                   </div>
 
+                  {onAskAI && (
+                    <button
+                      type="button"
+                      onClick={() => onAskAI(gem)}
+                      disabled={askDisabled}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-2 text-sm font-medium text-violet-300 transition-colors hover:border-violet-500/50 hover:bg-violet-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <MessageCircle className="size-4" />
+                      Ask AI about {gem.symbol}
+                    </button>
+                  )}
+
                   <div className="flex items-center justify-between border-t border-zinc-800/60 pt-2 text-[10px] text-zinc-600">
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 font-mono">
                       <DollarSign className="size-3" />
-                      Live CMC snapshot
+                      {gem.mint.slice(0, 4)}…{gem.mint.slice(-4)}
                     </span>
                     <span className="flex items-center gap-1">
                       <Activity className="size-3" />
@@ -257,6 +366,30 @@ export function GemCards({ gems, loading, error, emptyMessage }: GemCardsProps) 
             );
           })}
         </div>
+      )}
+
+      {!loading && failures.length > 0 && (
+        <Card className="border-zinc-800/80 bg-zinc-900/40">
+          <CardContent className="p-3">
+            <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-zinc-500">
+              <AlertCircle className="size-3.5 text-amber-500/70" />
+              {failures.length} mint{failures.length === 1 ? "" : "s"} skipped (on-chain enrichment failed)
+            </div>
+            <ul className="space-y-0.5">
+              {failures.map((fail) => (
+                <li
+                  key={fail.mint}
+                  className="flex items-baseline gap-2 text-[11px] text-zinc-600"
+                >
+                  <span className="shrink-0 font-mono text-zinc-500">
+                    {fail.mint.slice(0, 4)}…{fail.mint.slice(-4)}
+                  </span>
+                  <span className="truncate">{fail.reason}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       )}
     </section>
   );
