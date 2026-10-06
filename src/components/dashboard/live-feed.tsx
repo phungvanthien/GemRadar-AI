@@ -7,14 +7,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useRugcheckStream } from "@/hooks/useRugcheckStream";
 import { formatCurrency } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n/context";
 import type { RugcheckStreamToken } from "@/lib/types";
 
 // RugCheck's normalised score is 0-100, higher = riskier. Map it to a badge
 // tone the same way the rest of the dashboard reads risk.
-function riskBadge(score: number) {
-  if (score >= 60) return { variant: "danger" as const, label: "High risk" };
-  if (score >= 30) return { variant: "default" as const, label: "Caution" };
-  return { variant: "success" as const, label: "Low risk" };
+function riskBadge(score: number, t: (k: string) => string) {
+  if (score >= 60) return { variant: "danger" as const, label: t("activity.highRisk") || "High risk" };
+  if (score >= 30) return { variant: "default" as const, label: t("activity.caution") || "Caution" };
+  return { variant: "success" as const, label: t("activity.lowRisk") || "Low risk" };
 }
 
 function shortMint(mint: string) {
@@ -25,15 +26,15 @@ function shortMint(mint: string) {
 // is unthrottled ("live"); higher positions space tokens out so they're
 // readable. The slider index — not the ms value — is the control's state.
 const SPEED_STEPS = [
-  { label: "Live", intervalMs: 0 },
-  { label: "Fast", intervalMs: 1500 },
-  { label: "Medium", intervalMs: 3000 },
-  { label: "Slow", intervalMs: 6000 },
-  { label: "Slowest", intervalMs: 10000 },
+  { labelKey: "activity.speedLive", defaultLabel: "Live", intervalMs: 0 },
+  { labelKey: "activity.speedFast", defaultLabel: "Fast", intervalMs: 1500 },
+  { labelKey: "activity.speedMedium", defaultLabel: "Medium", intervalMs: 3000 },
+  { labelKey: "activity.speedSlow", defaultLabel: "Slow", intervalMs: 6000 },
+  { labelKey: "activity.speedSlowest", defaultLabel: "Slowest", intervalMs: 10000 },
 ];
 
-function TokenRow({ token }: { token: RugcheckStreamToken }) {
-  const risk = riskBadge(token.scoreNormalised);
+function TokenRow({ token, t }: { token: RugcheckStreamToken, t: (k: string) => string }) {
+  const risk = riskBadge(token.scoreNormalised, t);
   const label = token.symbol || token.name || shortMint(token.mint);
 
   return (
@@ -54,13 +55,13 @@ function TokenRow({ token }: { token: RugcheckStreamToken }) {
         </div>
         <p className="truncate font-mono text-[11px] text-zinc-500">{shortMint(token.mint)}</p>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-zinc-500">
-          {token.mintAuthorityRevoked && <span className="text-emerald-400/70">mint revoked</span>}
-          {token.freezeAuthorityRevoked && <span className="text-emerald-400/70">freeze revoked</span>}
+          {token.mintAuthorityRevoked && <span className="text-emerald-400/70">{t("activity.mintRevoked") || "mint revoked"}</span>}
+          {token.freezeAuthorityRevoked && <span className="text-emerald-400/70">{t("activity.freezeRevoked") || "freeze revoked"}</span>}
           {token.totalMarketLiquidity !== null && token.totalMarketLiquidity > 0 && (
             <span>LP {formatCurrency(token.totalMarketLiquidity, true)}</span>
           )}
           {token.totalHolders !== null && token.totalHolders > 0 && (
-            <span>{token.totalHolders.toLocaleString()} holders</span>
+            <span>{token.totalHolders.toLocaleString()} {t("activity.holders") || "holders"}</span>
           )}
         </div>
         {token.topRisks.length > 0 && (
@@ -74,6 +75,7 @@ function TokenRow({ token }: { token: RugcheckStreamToken }) {
 }
 
 export function LiveFeed() {
+  const { t } = useLanguage();
   const [speedIdx, setSpeedIdx] = useState(0);
   const revealIntervalMs = SPEED_STEPS[speedIdx].intervalMs;
   const { tokens, connected, error, pending } = useRugcheckStream({
@@ -93,7 +95,7 @@ export function LiveFeed() {
         <CardHeader className="border-b border-zinc-800/80 pb-3">
           <CardTitle className="flex items-center gap-2 text-orange-400">
             <Radio className="size-4" />
-            Live RugCheck Feed
+            {t("activity.feedTitle") || "Live RugCheck Feed"}
           </CardTitle>
           <div className="flex items-center gap-2 text-xs text-zinc-500">
             <span
@@ -101,20 +103,20 @@ export function LiveFeed() {
                 connected ? "animate-pulse bg-emerald-400" : "bg-zinc-600"
               }`}
             />
-            {connected ? "Streaming new tokens" : "Connecting…"}
+            {connected ? (t("activity.streaming") || "Streaming new tokens") : (t("common.connecting") || "Connecting…")}
           </div>
 
           <div className="mt-3 space-y-1.5">
             <div className="flex items-center justify-between text-[11px] text-zinc-500">
               <span className="flex items-center gap-1.5">
                 <Gauge className="size-3.5" />
-                Reveal speed
+                {t("activity.revealSpeed") || "Reveal speed"}
               </span>
               <span className="font-medium text-zinc-300">
-                {SPEED_STEPS[speedIdx].label}
+                {t(SPEED_STEPS[speedIdx].labelKey) || SPEED_STEPS[speedIdx].defaultLabel}
                 {pending > 0 && (
                   <span className="ml-1.5 text-orange-400/80">
-                    +{pending} queued
+                    +{pending} {t("activity.queued") || "queued"}
                   </span>
                 )}
               </span>
@@ -131,24 +133,24 @@ export function LiveFeed() {
               className="h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none transition-[background] duration-200 [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-orange-500 [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(249,115,22,0.6)] [&::-webkit-slider-thumb]:transition-shadow [&::-moz-range-thumb]:size-3.5 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-orange-500 [&::-moz-range-thumb]:shadow-[0_0_8px_rgba(249,115,22,0.6)]"
             />
             <div className="flex justify-between text-[10px] text-zinc-600">
-              <span>Live</span>
-              <span>Slowest</span>
+              <span>{t("activity.speedLive") || "Live"}</span>
+              <span>{t("activity.speedSlowest") || "Slowest"}</span>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 p-0">
+        <CardContent className="flex-1 p-0 relative">
           {error && (
             <p className="px-4 py-3 text-xs text-red-400">{error}</p>
           )}
-          <ScrollArea className="h-[min(70vh,600px)]">
+          <ScrollArea className="h-full absolute inset-0">
             {tokens.length === 0 ? (
               <p className="px-4 py-6 text-center text-xs text-zinc-600">
-                Waiting for the first token…
+                {t("activity.waiting") || "Waiting for the first token…"}
               </p>
             ) : (
               <ul className="divide-y divide-zinc-800/60">
                 {tokens.map((token) => (
-                  <TokenRow key={token.mint} token={token} />
+                  <TokenRow key={token.mint} token={token} t={t} />
                 ))}
               </ul>
             )}

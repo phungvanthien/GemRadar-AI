@@ -2,8 +2,8 @@ import { SettingsPanel } from "@/components/dashboard/settings-panel";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Cài đặt | AlphaHunter AI",
-  description: "Cấu hình volume mua Gems, tài khoản Telegram & X cho GemScore social",
+  title: "Settings | GemRadar AI",
+  description: "Configure bot parameters, social accounts and take profit strategies",
 };
 
 export default function SettingsPage() {

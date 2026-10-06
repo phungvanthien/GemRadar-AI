@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Crosshair, Settings, LineChart, Wallet } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/context";
 
 export function Header() {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const isSettings = pathname === "/settings";
   const isPortfolio = pathname === "/portfolio";
   const isMandate = pathname === "/mandate";
@@ -20,12 +22,12 @@ export function Header() {
           <div>
             <h1 className="text-lg font-bold tracking-tight">
               <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                AlphaHunter
+                GemRadar
               </span>{" "}
               <span className="text-zinc-100">AI</span>
             </h1>
             <p className="hidden text-xs text-zinc-500 sm:block">
-              Crypto intelligence · Hidden gem scanner
+              {t("common.cryptoIntelligence") || "Crypto intelligence · Hidden gem scanner"}
             </p>
           </div>
         </Link>
@@ -37,7 +39,7 @@ export function Header() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
             </span>
-            <span className="hidden text-xs font-medium text-zinc-400 sm:block">Live</span>
+            <span className="hidden text-xs font-medium text-zinc-400 sm:block">{t("common.live") || "Live"}</span>
           </div>
 
           {/* Mandate nav link */}
@@ -50,7 +52,7 @@ export function Header() {
             }`}
           >
             <Wallet className={`size-4 ${isMandate ? "text-amber-400" : ""}`} />
-            <span className="hidden sm:block">Uỷ thác</span>
+            <span className="hidden sm:block">{t("nav.mandate") || "Mandate"}</span>
           </Link>
 
           {/* Portfolio nav link */}
@@ -63,7 +65,7 @@ export function Header() {
             }`}
           >
             <LineChart className={`size-4 ${isPortfolio ? "text-amber-400" : ""}`} />
-            <span className="hidden sm:block">Danh mục</span>
+            <span className="hidden sm:block">{t("nav.portfolio") || "Portfolio"}</span>
           </Link>
 
           {/* Settings nav link */}
@@ -76,7 +78,7 @@ export function Header() {
             }`}
           >
             <Settings className={`size-4 ${isSettings ? "text-amber-400" : ""}`} />
-            <span className="hidden sm:block">Cài đặt</span>
+            <span className="hidden sm:block">{t("nav.settings") || "Settings"}</span>
           </Link>
         </div>
       </div>

@@ -1,0 +1,1270 @@
+{
+  "status": "completed",
+  "updatedAt": "2026-10-05T08:20:22.891Z",
+  "tokens": [
+    {
+      "mint": "7qDb5ND8pZUPeFJgPxuQ3o6LMNxHyWpZQp3CrHWZnULp",
+      "symbol": "WI",
+      "name": "Water Inu"
+    },
+    {
+      "mint": "EGedTSu2zdFNT1k7phURksCpcwHNyxepLzSMYGApump",
+      "symbol": "BEB1M",
+      "name": "BeB"
+    },
+    {
+      "mint": "Cbr5VMQnscAwo9LdJbKudUEZBDUhxu7zJNZuMaWBpump",
+      "symbol": "PRINTRACC",
+      "name": "printr/acc"
+    },
+    {
+      "mint": "HTTixgiUqGxesiGWtasmRv1hBGAtPLb9kHdz53RSpump",
+      "symbol": "MEMIND",
+      "name": "MeMind"
+    },
+    {
+      "mint": "ExCd1Wco1DZEHQL3nLbfLjaMgxhA468NTSx8nkifdRBP",
+      "symbol": "bul",
+      "name": "bul"
+    },
+    {
+      "mint": "9A2jUbgoDY97fruKHXvDd7eQiq4xvnW3By1BfH1Bwn9Y",
+      "symbol": "DeepSeekAI",
+      "name": "DeepSeek AI Agent"
+    },
+    {
+      "mint": "2yY5Vynsy1WUqnHMEfeJu2cgmXYYpyQ1b9yjpowJYaEA",
+      "symbol": "ROOMS",
+      "name": "ROOMS"
+    },
+    {
+      "mint": "12exqsrW5e9356xMQoGuXZWk5bvhciLWqWsEztnSrFEA",
+      "symbol": "KURUMI",
+      "name": "くるみちゃん"
+    },
+    {
+      "mint": "3YHi6kgUu2ErJ6ADhHBsR2xQFzxfpo8Tmu4R3nSehcaV",
+      "symbol": "Instinct",
+      "name": "Instinct"
+    },
+    {
+      "mint": "GUrQf9dzcZSrog7YRyx6uZjJfSDZuZrhu7F3S9Xpump",
+      "symbol": "proof",
+      "name": "proof ppl will buy anything"
+    },
+    {
+      "mint": "HpwTUg68iLisjFMh2cLZWKVhHi5oM2nrHKgWg2kqpump",
+      "symbol": "Pumprunn",
+      "name": "Pumprunn"
+    },
+    {
+      "mint": "5bMiX5uHzqg3kQW1rYCN4rAn4CM9oSeRrzecjvDFpump",
+      "symbol": "TRADE",
+      "name": "I DONT WANT TO"
+    },
+    {
+      "mint": "8emHfcKAFxJFjrjC9xQwAn9YNqriBAh3McQZTHfguHGR",
+      "symbol": "Astra",
+      "name": "Astra-Chan"
+    },
+    {
+      "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "symbol": "USDC",
+      "name": "USD Coin"
+    },
+    {
+      "mint": "DGpuRNRNbg2Hj8sPd21cp3XVYGjiozbzgt9EMrBYFr4G",
+      "symbol": "miniclouds",
+      "name": "miniclouds"
+    }
+  ],
+  "results": [
+    {
+      "symbol": "BEB1M",
+      "name": "BeB",
+      "gemScore": 8,
+      "riskScore": 4,
+      "potentialUpside": "3-8x medium-term",
+      "explanation": "Healthy distribution with top-10 at just 0.18, largest holder 5.75%, and 1,866 holders; authorities revoked, LP 100% locked, RugCheck score 1 with no insider clusters. Main caveat is extreme youth (4s) and modest ~$83k liquidity.",
+      "price": 0.0007168317140586676,
+      "marketCap": 725529,
+      "volume24h": 4496.93,
+      "percentChange24h": 1.84,
+      "mint": "EGedTSu2zdFNT1k7phURksCpcwHNyxepLzSMYGApump",
+      "onChain": {
+        "mint": "EGedTSu2zdFNT1k7phURksCpcwHNyxepLzSMYGApump",
+        "decimals": 6,
+        "supply": 999720758.831046,
+        "holderConcentrationTop10": 0.18297931796262326,
+        "largestHolderShare": 0.057549707520149894,
+        "holderCount": 1866,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": 4,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 82740.52935261342
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 66.64534639128745,
+          "covered": true,
+          "notes": [
+            "deep LP $83,435",
+            "vol24h $4,497",
+            "turnover 0.01×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 66.04133545310016,
+          "covered": true,
+          "notes": [
+            "43% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 95.75980197623414,
+          "covered": true,
+          "notes": [
+            "top10 18%",
+            "1,866 holders"
+          ]
+        },
+        "total": 86,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "DeepSeekAI",
+      "name": "DeepSeek AI Agent",
+      "gemScore": 7,
+      "riskScore": 4,
+      "potentialUpside": "2-5x medium-term",
+      "explanation": "Broad base of 47,467 holders with top-10 at 0.36 and largest wallet 23%, authorities revoked, LP fully locked, RugCheck score 1 and no insiders. Very young (5s) and thin 24h volume keep risk moderate.",
+      "price": 3.833687057389593e-12,
+      "marketCap": 160903,
+      "volume24h": 247.38,
+      "percentChange24h": 0.56,
+      "mint": "9A2jUbgoDY97fruKHXvDd7eQiq4xvnW3By1BfH1Bwn9Y",
+      "onChain": {
+        "mint": "9A2jUbgoDY97fruKHXvDd7eQiq4xvnW3By1BfH1Bwn9Y",
+        "decimals": 2,
+        "supply": 42010042832966660,
+        "holderConcentrationTop10": 0.36438308284445375,
+        "largestHolderShare": 0.23267407359633374,
+        "holderCount": 47467,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": 5,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 74893.27240127955
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 64.71536546055387,
+          "covered": true,
+          "notes": [
+            "deep LP $74,689",
+            "vol24h $247",
+            "turnover 0.00×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 68.8,
+          "covered": true,
+          "notes": [
+            "48% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 59.169053417508295,
+          "covered": true,
+          "notes": [
+            "top10 36%",
+            "largest holder 23%",
+            "47,467 holders"
+          ]
+        },
+        "total": 78,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "KURUMI",
+      "name": "くるみちゃん",
+      "gemScore": 4,
+      "riskScore": 7,
+      "potentialUpside": "2-4x high-risk",
+      "explanation": "Top-10 at 0.76 and single holder 57% give one wallet dump power, and RugCheck flags Low Liquidity plus 5 insider wallet clusters and name/symbol mismatches. Only promising for its 241-holder base relative to peers.",
+      "price": 0.000008648158508029894,
+      "marketCap": 7870,
+      "volume24h": 28102.77,
+      "percentChange24h": -68.28,
+      "mint": "12exqsrW5e9356xMQoGuXZWk5bvhciLWqWsEztnSrFEA",
+      "onChain": {
+        "mint": "12exqsrW5e9356xMQoGuXZWk5bvhciLWqWsEztnSrFEA",
+        "decimals": 6,
+        "supply": 909429480.553415,
+        "holderConcentrationTop10": 0.7574428812163002,
+        "largestHolderShare": 0.5679432318124862,
+        "holderCount": 241,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 30,
+          "topRisks": [
+            "Symbol Mismatch",
+            "Low Liquidity",
+            "Name Mismatch"
+          ],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 5,
+          "totalMarketLiquidity": 6792.992062243749
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 91,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Symbol Mismatch",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 62.04911111111111,
+          "covered": true,
+          "notes": [
+            "LP $6,802",
+            "vol24h $28,103",
+            "turnover 3.57×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 27.17355371900826,
+          "covered": true,
+          "notes": [
+            "45% buys",
+            "5 insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 6.0249999999999995,
+          "covered": true,
+          "notes": [
+            "top10 76% (very concentrated)",
+            "largest holder 57%",
+            "241 holders"
+          ]
+        },
+        "total": 57,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "bul",
+      "name": "bul",
+      "gemScore": 3,
+      "riskScore": 8,
+      "potentialUpside": "2-4x high-risk",
+      "explanation": "Largest holder 82%, top-10 94%, and just ~$132 total liquidity means the market can be exited with almost no capital; 2 insider clusters and a Low Liquidity flag compound the rug risk despite locked LP.",
+      "price": 0,
+      "marketCap": 36065.95,
+      "volume24h": 8781.57,
+      "percentChange24h": 80.23,
+      "mint": "ExCd1Wco1DZEHQL3nLbfLjaMgxhA468NTSx8nkifdRBP",
+      "onChain": {
+        "mint": "ExCd1Wco1DZEHQL3nLbfLjaMgxhA468NTSx8nkifdRBP",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 0.938818284958568,
+        "largestHolderShare": 0.817182055018273,
+        "holderCount": 175,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 34,
+          "topRisks": [
+            "Low Liquidity"
+          ],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 2,
+          "totalMarketLiquidity": 131.59798926962247
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 89.8,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 4.879831938664082,
+          "covered": true,
+          "notes": [
+            "thin LP $1",
+            "vol24h $8,782",
+            "turnover 0.24×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 53.89473684210526,
+          "covered": true,
+          "notes": [
+            "50% buys",
+            "2 insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 4.375,
+          "covered": true,
+          "notes": [
+            "top10 94% (very concentrated)",
+            "largest holder 82%",
+            "175 holders"
+          ]
+        },
+        "total": 43,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "Instinct",
+      "name": "Instinct",
+      "gemScore": 3,
+      "riskScore": 8,
+      "potentialUpside": "2-5x high-risk",
+      "explanation": "Only 52 holders with top-10 at 0.98 and largest wallet 85% leaves supply fully concentrated, and ~$3.8k liquidity is thin enough to move easily despite a clean RugCheck score.",
+      "price": 0.00000466080258623491,
+      "marketCap": 4803.57,
+      "volume24h": 88494.2,
+      "percentChange24h": 3.85,
+      "mint": "3YHi6kgUu2ErJ6ADhHBsR2xQFzxfpo8Tmu4R3nSehcaV",
+      "onChain": {
+        "mint": "3YHi6kgUu2ErJ6ADhHBsR2xQFzxfpo8Tmu4R3nSehcaV",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 0.9807736499573589,
+        "largestHolderShare": 0.846263393698414,
+        "holderCount": 52,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": 35,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 3788.3881811471592
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 54.17023751198353,
+          "covered": true,
+          "notes": [
+            "LP $4,269",
+            "vol24h $88,494",
+            "turnover 18.42×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 70.98488796248046,
+          "covered": true,
+          "notes": [
+            "52% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 1.3,
+          "covered": true,
+          "notes": [
+            "top10 98% (very concentrated)",
+            "largest holder 85%",
+            "52 holders"
+          ]
+        },
+        "total": 62,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "TRADE",
+      "name": "I DONT WANT TO",
+      "gemScore": 2,
+      "riskScore": 9,
+      "potentialUpside": "lottery-ticket only",
+      "explanation": "Only 2 holders with top-10 owning 100%, RugCheck flags Single holder ownership and High holder concentration, and ~$1k liquidity makes a rug trivial.",
+      "price": 0.0000018929723188152843,
+      "marketCap": 1881.3,
+      "volume24h": 1674.42,
+      "percentChange24h": -47.23,
+      "mint": "5bMiX5uHzqg3kQW1rYCN4rAn4CM9oSeRrzecjvDFpump",
+      "onChain": {
+        "mint": "5bMiX5uHzqg3kQW1rYCN4rAn4CM9oSeRrzecjvDFpump",
+        "decimals": 6,
+        "supply": 2000000000,
+        "holderConcentrationTop10": 1,
+        "largestHolderShare": 0.5418967134219299,
+        "holderCount": 2,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 44,
+          "topRisks": [
+            "Single holder ownership",
+            "High holder concentration"
+          ],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 1048.166915447663
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 86.8,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Single holder ownership",
+            "High holder concentration"
+          ]
+        },
+        "liquidity": {
+          "score": 34.47787158472664,
+          "covered": true,
+          "notes": [
+            "LP $1,861",
+            "vol24h $1,674",
+            "turnover 0.89×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 72.72727272727272,
+          "covered": true,
+          "notes": [
+            "55% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.05,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 54%",
+            "2 holders"
+          ]
+        },
+        "total": 51,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "MEMIND",
+      "name": "MeMind",
+      "gemScore": 1,
+      "riskScore": 9,
+      "potentialUpside": "avoid",
+      "explanation": "46 holders, largest wallet 98%, Low Liquidity flag and ~$2.9k liquidity, with a -94% 24h move suggesting a dump already underway.",
+      "price": 0.000002931889001618166,
+      "marketCap": 2523,
+      "volume24h": 67392.28,
+      "percentChange24h": -94.13,
+      "mint": "HTTixgiUqGxesiGWtasmRv1hBGAtPLb9kHdz53RSpump",
+      "onChain": {
+        "mint": "HTTixgiUqGxesiGWtasmRv1hBGAtPLb9kHdz53RSpump",
+        "decimals": 6,
+        "supply": 860524997.729294,
+        "holderConcentrationTop10": 0.9949313327517708,
+        "largestHolderShare": 0.9847876647375826,
+        "holderCount": 46,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 32,
+          "topRisks": [
+            "Low Liquidity"
+          ],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 2874.736551352326
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 90.4,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 49.830284444444445,
+          "covered": true,
+          "notes": [
+            "LP $2,874",
+            "vol24h $67,392",
+            "turnover 26.71×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 67.79661016949153,
+          "covered": true,
+          "notes": [
+            "46% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 1.15,
+          "covered": true,
+          "notes": [
+            "top10 99% (very concentrated)",
+            "largest holder 98%",
+            "46 holders"
+          ]
+        },
+        "total": 57,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "proof",
+      "name": "proof ppl will buy anything",
+      "gemScore": 1,
+      "riskScore": 9,
+      "potentialUpside": "avoid",
+      "explanation": "Largest holder 98% of 107 holders, Low Liquidity flag, ~$2.5k liquidity and essentially no 24h volume signal a dead, concentrated market.",
+      "price": 0.000002502947301343452,
+      "marketCap": 2388,
+      "volume24h": 0.16,
+      "percentChange24h": 0,
+      "mint": "GUrQf9dzcZSrog7YRyx6uZjJfSDZuZrhu7F3S9Xpump",
+      "onChain": {
+        "mint": "GUrQf9dzcZSrog7YRyx6uZjJfSDZuZrhu7F3S9Xpump",
+        "decimals": 6,
+        "supply": 953683547.51997,
+        "holderConcentrationTop10": 0.98858703720036,
+        "largestHolderShare": 0.975199700801174,
+        "holderCount": 107,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 33,
+          "topRisks": [
+            "Low Liquidity"
+          ],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 2537.522125826032
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 90.1,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 18.79002447794528,
+          "covered": true,
+          "notes": [
+            "LP $2,539",
+            "vol24h $0",
+            "turnover 0.00×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 40,
+          "covered": true,
+          "notes": [
+            "0% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 2.675,
+          "covered": true,
+          "notes": [
+            "top10 99% (very concentrated)",
+            "largest holder 98%",
+            "107 holders"
+          ]
+        },
+        "total": 45,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "miniclouds",
+      "name": "miniclouds",
+      "gemScore": 1,
+      "riskScore": 9,
+      "potentialUpside": "avoid",
+      "explanation": "11 holders with top-10 at 100% and largest wallet 99%, plus an insider cluster and only ~$2.3k liquidity make this trivially manipulable.",
+      "price": 0.0000034688135305146812,
+      "marketCap": 3465.03076988815,
+      "volume24h": 0,
+      "percentChange24h": 0,
+      "mint": "DGpuRNRNbg2Hj8sPd21cp3XVYGjiozbzgt9EMrBYFr4G",
+      "onChain": {
+        "mint": "DGpuRNRNbg2Hj8sPd21cp3XVYGjiozbzgt9EMrBYFr4G",
+        "decimals": 6,
+        "supply": 998909494.386696,
+        "holderConcentrationTop10": 0.9999999999999987,
+        "largestHolderShare": 0.9891727934164342,
+        "holderCount": 11,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 1,
+          "totalMarketLiquidity": 2337.516109862208
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 31.913535514218314,
+          "covered": true,
+          "notes": [
+            "LP $3,681",
+            "volume 24h N/A"
+          ]
+        },
+        "moneyFlow": {
+          "score": 80,
+          "covered": true,
+          "notes": [
+            "1 insider network"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.27499999999999997,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 99%",
+            "11 holders"
+          ]
+        },
+        "total": 57,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "WI",
+      "name": "Water Inu",
+      "gemScore": 1,
+      "riskScore": 10,
+      "potentialUpside": "avoid",
+      "explanation": "Only 3 holders with a single wallet holding 99.89% of supply and ~$3k liquidity — one account controls the entire market.",
+      "price": 0.000003415731074909865,
+      "marketCap": 3411.47,
+      "volume24h": 7941.43,
+      "percentChange24h": -16.89,
+      "mint": "7qDb5ND8pZUPeFJgPxuQ3o6LMNxHyWpZQp3CrHWZnULp",
+      "onChain": {
+        "mint": "7qDb5ND8pZUPeFJgPxuQ3o6LMNxHyWpZQp3CrHWZnULp",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 1,
+        "largestHolderShare": 0.9989142966786719,
+        "holderCount": 3,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 3068.99361378191
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 52.26536569733655,
+          "covered": true,
+          "notes": [
+            "LP $3,657",
+            "vol24h $7,941",
+            "turnover 2.33×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 76.31578947368422,
+          "covered": true,
+          "notes": [
+            "61% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.075,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "3 holders"
+          ]
+        },
+        "total": 62,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "PRINTRACC",
+      "name": "printr/acc",
+      "gemScore": 1,
+      "riskScore": 10,
+      "potentialUpside": "avoid",
+      "explanation": "Single holder owns 100% of supply with ~$2.7k liquidity; this is a one-wallet token that can be dumped at will.",
+      "price": 0.000003419225819484271,
+      "marketCap": 3404.57,
+      "volume24h": 381.12,
+      "percentChange24h": -3.84,
+      "mint": "Cbr5VMQnscAwo9LdJbKudUEZBDUhxu7zJNZuMaWBpump",
+      "onChain": {
+        "mint": "Cbr5VMQnscAwo9LdJbKudUEZBDUhxu7zJNZuMaWBpump",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 1,
+        "largestHolderShare": 1,
+        "holderCount": 1,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 2712.867479280028
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 24.511265243612133,
+          "covered": true,
+          "notes": [
+            "LP $3,659",
+            "vol24h $381",
+            "turnover 0.11×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 60,
+          "covered": true,
+          "notes": [
+            "33% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 52,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "ROOMS",
+      "name": "ROOMS",
+      "gemScore": 1,
+      "riskScore": 10,
+      "potentialUpside": "avoid",
+      "explanation": "Just 2 holders with top-10 at 100% and largest wallet 99.86% on ~$3.3k liquidity — fully concentrated and easy to rug despite a clean RugCheck score.",
+      "price": 0.0000034993381454679225,
+      "marketCap": 4110.34,
+      "volume24h": 3134.98,
+      "percentChange24h": 7.6,
+      "mint": "2yY5Vynsy1WUqnHMEfeJu2cgmXYYpyQ1b9yjpowJYaEA",
+      "onChain": {
+        "mint": "2yY5Vynsy1WUqnHMEfeJu2cgmXYYpyQ1b9yjpowJYaEA",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 1,
+        "largestHolderShare": 0.998575496793203,
+        "holderCount": 2,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": 32,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 3305.630760860264
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 37.536561960300396,
+          "covered": true,
+          "notes": [
+            "LP $3,662",
+            "vol24h $3,135",
+            "turnover 0.76×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 72.1951219512195,
+          "covered": true,
+          "notes": [
+            "54% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.05,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "2 holders"
+          ]
+        },
+        "total": 57,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "Pumprunn",
+      "name": "Pumprunn",
+      "gemScore": 1,
+      "riskScore": 10,
+      "potentialUpside": "avoid",
+      "explanation": "Single holder owns 100% of supply with ~$3.4k liquidity, a textbook one-wallet dump setup.",
+      "price": 0.000003428529058751348,
+      "marketCap": 3401.49,
+      "volume24h": 1991.6,
+      "percentChange24h": -3.89,
+      "mint": "HpwTUg68iLisjFMh2cLZWKVhHi5oM2nrHKgWg2kqpump",
+      "onChain": {
+        "mint": "HpwTUg68iLisjFMh2cLZWKVhHi5oM2nrHKgWg2kqpump",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 1,
+        "largestHolderShare": 1,
+        "holderCount": 1,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 3386.46781296571
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 33.950882576041195,
+          "covered": true,
+          "notes": [
+            "LP $3,649",
+            "vol24h $1,992",
+            "turnover 0.59×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 72.72727272727272,
+          "covered": true,
+          "notes": [
+            "55% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "Astra",
+      "name": "Astra-Chan",
+      "gemScore": 1,
+      "riskScore": 10,
+      "potentialUpside": "avoid",
+      "explanation": "One wallet holds 100% of supply on ~$2.8k liquidity, leaving the entire market under single-account control.",
+      "price": 0.00000351722256261663,
+      "marketCap": 3410.44,
+      "volume24h": 2289.13,
+      "percentChange24h": -21.92,
+      "mint": "8emHfcKAFxJFjrjC9xQwAn9YNqriBAh3McQZTHfguHGR",
+      "onChain": {
+        "mint": "8emHfcKAFxJFjrjC9xQwAn9YNqriBAh3McQZTHfguHGR",
+        "decimals": 6,
+        "supply": 1000000000,
+        "holderConcentrationTop10": 1,
+        "largestHolderShare": 1,
+        "holderCount": 1,
+        "mintAuthorityRevoked": true,
+        "freezeAuthorityRevoked": true,
+        "ageSeconds": null,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": 100,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 2787.9384937843583
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 35.69898939769149,
+          "covered": true,
+          "notes": [
+            "LP $3,660",
+            "vol24h $2,289",
+            "turnover 0.67×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 65.26315789473684,
+          "covered": true,
+          "notes": [
+            "42% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "symbol": "USDC",
+      "name": "USD Coin",
+      "gemScore": 1,
+      "riskScore": 7,
+      "potentialUpside": "not a gem (stablecoin)",
+      "explanation": "This is a mislabeled or spoofed USDC entry: mint and freeze authorities are both un-revoked and RugCheck reports zero market liquidity, so it carries dilution and freeze risk with no upside play.",
+      "price": 0.9999126996192332,
+      "marketCap": 60915449295,
+      "volume24h": 990729.64,
+      "percentChange24h": 0.01,
+      "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "onChain": {
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "decimals": 6,
+        "supply": 8101184335.156993,
+        "holderConcentrationTop10": 0.35545619744377555,
+        "largestHolderShare": 0.141135591185234,
+        "holderCount": null,
+        "mintAuthorityRevoked": false,
+        "freezeAuthorityRevoked": false,
+        "ageSeconds": 48,
+        "liquidity": null,
+        "rugcheck": {
+          "scoreNormalised": 1,
+          "topRisks": [],
+          "lpLockedPct": null,
+          "insiderNetworkCount": 0,
+          "totalMarketLiquidity": 0
+        }
+      },
+      "breakdown": {
+        "security": {
+          "score": 29.7,
+          "covered": true,
+          "notes": [
+            "mint authority LIVE",
+            "freeze authority LIVE",
+            "LP lock unknown"
+          ]
+        },
+        "liquidity": {
+          "score": 70.00032528025369,
+          "covered": true,
+          "notes": [
+            "deep LP $1,472,887",
+            "vol24h $990,730",
+            "turnover 0.00×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 90.24875621890547,
+          "covered": true,
+          "notes": [
+            "84% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 56.97064406727688,
+          "covered": true,
+          "notes": [
+            "top10 36%",
+            "largest holder 14%",
+            "holder count unknown"
+          ]
+        },
+        "total": 54,
+        "coverage": 0.9
+      }
+    }
+  ]
+}

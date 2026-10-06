@@ -24,6 +24,23 @@ export interface TradeConfig {
   killSwitch: boolean;
   // The ONE gate. Real funds move only when this is true. Depends on autoBuyEnabled
   // from settings, so it's resolved by canTradeLive(settings), not stored here.
+
+  // ── Token-safety entry gate (POST-MORTEM P0) ───────────────────────────
+  // Hunting pump.fun memes with no token-level filter is how CATGPT rugged for
+  // -100% and SIP sold at -99.5%. These knobs drive src/lib/token-safety.ts.
+  // Minimum USD market liquidity for an entry — below this, stop-loss can't fill
+  // and a rug drains the pool instantly. 0 disables the floor (fail-open).
+  minLiquidityUsd: number;
+  // Reject when the single largest holder exceeds this share of supply (0-1).
+  maxTopHolderShare: number;
+  // Reject when the top-10 holders exceed this share of supply (0-1).
+  maxTop10Share: number;
+  // Minimum token age in seconds; a few minutes of survival filters snipe-rugs.
+  minTokenAgeSeconds: number;
+  // Minimum distinct holder count. 0 disables (null holder data fails open).
+  minHolderCount: number;
+  // Reject when the computed rug-risk score (0-100) reaches this threshold.
+  maxRugRiskScore: number;
 }
 
 const DEFAULTS = {
@@ -34,6 +51,12 @@ const DEFAULTS = {
   slippageBps: 100, // 1%
   maxPriceImpactPct: 3, // reject quotes with >3% price impact
   maxPoolShare: 0.02, // buy must be <=2% of pool liquidity
+  minLiquidityUsd: 20_000, // post-mortem floor: below this stop-loss can't fill
+  maxTopHolderShare: 0.3, // single holder > 30% of supply -> reject
+  maxTop10Share: 0.6, // top-10 > 60% of supply -> reject
+  minTokenAgeSeconds: 300, // 5 min survival filters most snipe-and-rug launches
+  minHolderCount: 50, // too few holders -> illiquid / insider-held
+  maxRugRiskScore: 60, // reject when graded rug risk reaches this
 };
 
 function envNum(key: string, fallback: number): number {
@@ -68,6 +91,12 @@ export function getTradeConfig(): TradeConfig {
     maxPriceImpactPct: envNum("TRADE_MAX_PRICE_IMPACT_PCT", DEFAULTS.maxPriceImpactPct),
     maxPoolShare: envNum("TRADE_MAX_POOL_SHARE", DEFAULTS.maxPoolShare),
     killSwitch: envBool("TRADE_KILL_SWITCH", false),
+    minLiquidityUsd: envNum("TRADE_MIN_LIQUIDITY_USD", DEFAULTS.minLiquidityUsd),
+    maxTopHolderShare: envNum("TRADE_MAX_TOP_HOLDER_SHARE", DEFAULTS.maxTopHolderShare),
+    maxTop10Share: envNum("TRADE_MAX_TOP10_SHARE", DEFAULTS.maxTop10Share),
+    minTokenAgeSeconds: envNum("TRADE_MIN_TOKEN_AGE_SECONDS", DEFAULTS.minTokenAgeSeconds),
+    minHolderCount: envNum("TRADE_MIN_HOLDER_COUNT", DEFAULTS.minHolderCount),
+    maxRugRiskScore: envNum("TRADE_MAX_RUG_RISK_SCORE", DEFAULTS.maxRugRiskScore),
   });
   return cached;
 }

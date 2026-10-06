@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useLanguage } from "@/lib/i18n/context";
 
 // ── Types (mirror the /api/mandate shape) ─────────────────────────────────────
 
@@ -70,13 +71,35 @@ function pnlColor(v: number): string {
   return "text-zinc-400";
 }
 
+// Compare the fields the client sent against the server's saved values and
+// describe any the server clamped. Only numeric config fields are checked.
+function describeAdjustments(sent: Mandate, saved: Mandate, t: (k: string) => string): string[] {
+  const fields: { key: keyof Mandate; label: string; unit: string }[] = [
+    { key: "principalSol", label: t("mandate.principalLabel"), unit: "SOL" },
+    { key: "perTradePctOfPrincipal", label: t("mandate.tradePctLabel"), unit: "%" },
+    { key: "reserveSol", label: t("mandate.reserveLabel"), unit: "SOL" },
+    { key: "maxOpenPositions", label: t("mandate.positionsLabel"), unit: "" },
+    { key: "maxDrawdownPct", label: t("mandate.drawdownLabel"), unit: "%" },
+    { key: "dailyLossLimitPct", label: t("mandate.dailyLossLabel"), unit: "%" },
+  ];
+  const notes: string[] = [];
+  for (const f of fields) {
+    const a = sent[f.key] as number;
+    const b = saved[f.key] as number;
+    if (typeof a === "number" && typeof b === "number" && Math.abs(a - b) > 1e-9) {
+      notes.push(`${f.label}: ${a}${f.unit} → ${b}${f.unit}`);
+    }
+  }
+  return notes;
+}
+
 const STATUS_META: Record<
   MandateStatus,
-  { label: string; cls: string; dot: string }
+  { labelKey: string; defaultLabel: string; cls: string; dot: string }
 > = {
-  active: { label: "Đang chạy", cls: "text-emerald-400 bg-emerald-500/15", dot: "bg-emerald-500" },
-  paused: { label: "Tạm dừng", cls: "text-amber-400 bg-amber-500/15", dot: "bg-amber-500" },
-  stopped: { label: "Đã dừng", cls: "text-zinc-400 bg-zinc-700/40", dot: "bg-zinc-500" },
+  active: { labelKey: "mandate.active", defaultLabel: "Đang chạy", cls: "text-emerald-400 bg-emerald-500/15", dot: "bg-emerald-500" },
+  paused: { labelKey: "mandate.paused", defaultLabel: "Tạm dừng", cls: "text-amber-400 bg-amber-500/15", dot: "bg-amber-500" },
+  stopped: { labelKey: "mandate.stopped", defaultLabel: "Đã dừng", cls: "text-zinc-400 bg-zinc-700/40", dot: "bg-zinc-500" },
 };
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -153,12 +176,15 @@ function SliderRow({
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function MandatePanel() {
+  const { t } = useLanguage();
   const [mandate, setMandate] = useState<Mandate | null>(null);
   const [acct, setAcct] = useState<Accounting | null>(null);
   const [mode, setMode] = useState<"live" | "dry-run" | null>(null);
+  const [minReserveSol, setMinReserveSol] = useState(0.05);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [adjustedNote, setAdjustedNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmStop, setConfirmStop] = useState(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -173,13 +199,18 @@ export function MandatePanel() {
       if (!mRes.ok) throw new Error(mData.error ?? "Không tải được uỷ thác");
       setMandate(mData.mandate);
       setAcct(mData.accounting);
+      if (typeof mData.minReserveSol === "number") setMinReserveSol(mData.minReserveSol);
       if (pRes.ok) {
         const pData = await pRes.json();
-        // Derive live/dry-run from whether any open position is live, else wallet.
-        const anyLive = (pData.gems ?? []).some(
-          (g: { mode: string }) => g.mode === "live",
-        );
-        setMode(anyLive || pData.wallet?.address ? (anyLive ? "live" : "dry-run") : "dry-run");
+        if (pData.effectiveMode) {
+          setMode(pData.effectiveMode);
+        } else {
+          // Fallback if effectiveMode is not available
+          const anyLive = (pData.gems ?? []).some(
+            (g: { mode: string }) => g.mode === "live",
+          );
+          setMode(anyLive || pData.wallet?.address ? (anyLive ? "live" : "dry-run") : "dry-run");
+        }
       }
       setError(null);
     } catch (e) {
@@ -210,34 +241,56 @@ export function MandatePanel() {
       if (!mandate) return;
       setSaving(true);
       setError(null);
+      setAdjustedNote(null);
       try {
-        const body = {
+        const sent = {
           ...mandate,
-          status: goActive ? "active" : mandate.status,
+          status: goActive ? ("active" as MandateStatus) : mandate.status,
         };
         const res = await fetch("/api/mandate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          body: JSON.stringify(sent),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "Lưu thất bại");
-        setMandate(data.mandate);
+
+        // The server clamps every numeric field to a safe range. Tell the user
+        // which values it changed, so a silently-adjusted save never looks like a
+        // "didn't save" bug.
+        const persisted = data.mandate as Mandate;
+        const adjustments = describeAdjustments(sent, persisted, t);
+        setAdjustedNote(adjustments.length > 0 ? adjustments.join(" · ") : null);
+
+        setMandate(persisted);
+        if (typeof data.minReserveSol === "number") setMinReserveSol(data.minReserveSol);
         flashSaved();
-        await load();
+
+        // Refresh the accounting snapshot (equity/deployed/available) without
+        // overwriting the just-saved mandate or the adjustment comparison above.
+        try {
+          const acctRes = await fetch("/api/mandate", { cache: "no-store" });
+          if (acctRes.ok) {
+            const acctData = await acctRes.json();
+            if (acctData.accounting) setAcct(acctData.accounting);
+          }
+        } catch {
+          // Accounting refresh is best-effort; the 20s poll will catch up.
+        }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Lỗi không xác định");
+        setError(e instanceof Error ? e.message : t("settings.unknownError"));
       } finally {
         setSaving(false);
       }
     },
-    [mandate, flashSaved, load],
+    [mandate, flashSaved, t],
   );
 
   const runAction = useCallback(
     async (action: "pause" | "resume" | "stop", liquidate = false) => {
       setSaving(true);
       setError(null);
+      setAdjustedNote(null);
       try {
         const res = await fetch(`/api/mandate?action=${action}`, {
           method: "POST",
@@ -245,18 +298,18 @@ export function MandatePanel() {
           body: JSON.stringify(action === "stop" ? { liquidate } : {}),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Thao tác thất bại");
+        if (!res.ok) throw new Error(data.error ?? t("common.error"));
         if (data.liquidationNote) setError(null);
         flashSaved();
         await load();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Lỗi không xác định");
+        setError(e instanceof Error ? e.message : t("settings.unknownError"));
       } finally {
         setSaving(false);
         setConfirmStop(false);
       }
     },
-    [flashSaved, load],
+    [flashSaved, load, t],
   );
 
   if (loading || !mandate || !acct) {
@@ -279,10 +332,10 @@ export function MandatePanel() {
         <div>
           <h1 className="flex items-center gap-2.5 text-xl font-bold text-zinc-50">
             <Wallet className="size-5 text-amber-400" />
-            Uỷ thác vốn săn Gems
+            {t("mandate.title")}
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Giao một phần vốn SOL cho bot tự săn gems, với giới hạn rủi ro bạn đặt
+            {t("mandate.description")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -290,13 +343,13 @@ export function MandatePanel() {
             className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${status.cls}`}
           >
             <span className={`inline-block size-2 rounded-full ${status.dot}`} />
-            {status.label}
+            {t(status.labelKey) || status.defaultLabel}
           </span>
           <button
             type="button"
             onClick={load}
             className="rounded-lg p-2 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
-            title="Làm mới"
+            title={t("common.refresh")}
           >
             <RefreshCw className="size-4" />
           </button>
@@ -313,15 +366,23 @@ export function MandatePanel() {
         >
           <ShieldCheck className="size-4 shrink-0" />
           {mode === "live"
-            ? "Chế độ LIVE — bot ký giao dịch thật bằng ví server."
-            : "Chế độ DRY-RUN — mô phỏng, không ký giao dịch thật."}
+            ? t("mandate.liveModeNote")
+            : t("mandate.dryRunNote")}
         </div>
       )}
 
       {saved && (
         <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
           <CheckCircle2 className="size-4 shrink-0" />
-          Đã lưu thành công!
+          {t("common.savedSuccess")}
+        </div>
+      )}
+      {adjustedNote && (
+        <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
+          <AlertTriangle className="size-4 shrink-0 mt-0.5" />
+          <span>
+            {t("mandate.adjustedNote")}: {adjustedNote}
+          </span>
         </div>
       )}
       {error && (
@@ -335,45 +396,45 @@ export function MandatePanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-100">
-            Tổng quan vốn
+            {t("mandate.capitalOverview")}
           </h2>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <StatTile label="Vốn gốc" value={fmtSol(acct.principalSol)} sub="đã uỷ thác" />
+            <StatTile label={t("mandate.availableCapital")} value={fmtSol(acct.principalSol)} />
             <StatTile
-              label="Đang triển khai"
+              label={t("mandate.allocatedCapital")}
               value={fmtSol(acct.deployedSol)}
-              sub={`${acct.openCount}/${acct.maxOpenPositions} vị thế`}
+              sub={`${acct.openCount}/${acct.maxOpenPositions} ${t("mandate.positionsUnit")}`}
             />
-            <StatTile label="Khả dụng" value={fmtSol(acct.availableSol)} sub="chờ vào lệnh" />
+            <StatTile label={t("mandate.available")} value={fmtSol(acct.availableSol)} sub={t("mandate.availableSub")} />
             <StatTile
-              label="Equity"
+              label={t("mandate.equity")}
               value={fmtSol(acct.equitySol)}
-              sub="gốc + lãi/lỗ"
+              sub={t("mandate.equitySub")}
               valueClass={pnlColor(pnlSinceStart)}
             />
             <StatTile
-              label="Lãi/Lỗ"
+              label={t("mandate.profitLoss")}
               value={fmtSigned(pnlSinceStart)}
               sub={`${acct.drawdownPct >= 0 ? "+" : ""}${acct.drawdownPct.toFixed(1)}%`}
               valueClass={pnlColor(pnlSinceStart)}
             />
             <StatTile
-              label="Lệnh/kích thước"
+              label={t("mandate.tradeSize")}
               value={fmtSol(acct.perTradeSizeSol)}
-              sub="mỗi lần mua"
+              sub={t("mandate.tradeSizeSub")}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <StatTile
-              label="Đã chốt (tổng)"
+              label={t("mandate.realizedTotal")}
               value={fmtSigned(acct.realizedPnlSol)}
               valueClass={pnlColor(acct.realizedPnlSol)}
             />
             <StatTile
-              label="Đã chốt (hôm nay)"
+              label={t("mandate.realizedToday")}
               value={fmtSigned(acct.realizedTodaySol)}
               valueClass={pnlColor(acct.realizedTodaySol)}
             />
@@ -382,7 +443,7 @@ export function MandatePanel() {
           {drawdownNearLimit && (
             <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
               <AlertTriangle className="size-3.5 shrink-0" />
-              Đang gần ngưỡng cắt lỗ danh mục ({mandate.maxDrawdownPct}%).
+              {t("mandate.drawdownWarning")} ({mandate.maxDrawdownPct}%).
             </div>
           )}
         </CardContent>
@@ -392,12 +453,12 @@ export function MandatePanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-100">
-            Phân bổ & giới hạn rủi ro
+            {t("mandate.allocationTitle")}
           </h2>
         </CardHeader>
         <CardContent className="space-y-6">
           <SliderRow
-            label="Vốn gốc uỷ thác"
+            label={t("mandate.principalLabel")}
             icon={<Wallet className="size-3.5 text-amber-400" />}
             value={mandate.principalSol}
             unit="SOL"
@@ -405,10 +466,10 @@ export function MandatePanel() {
             max={100}
             step={0.1}
             onChange={(v) => patch({ principalSol: v })}
-            hint="Tổng SOL bot được phép dùng để săn gems. Chỉ nạp đúng số bạn muốn uỷ thác."
+            hint={t("mandate.principalHint")}
           />
           <SliderRow
-            label="% vốn mỗi lệnh"
+            label={t("mandate.tradePctLabel")}
             icon={<Percent className="size-3.5 text-amber-400" />}
             value={mandate.perTradePctOfPrincipal}
             unit="%"
@@ -416,27 +477,25 @@ export function MandatePanel() {
             max={100}
             step={1}
             onChange={(v) => patch({ perTradePctOfPrincipal: v })}
-            hint={`Mỗi vị thế dùng ${fmtSol(
-              (acct.principalSol * mandate.perTradePctOfPrincipal) / 100,
-            )} (trước khi bị giới hạn bởi vốn khả dụng và trần/lệnh của operator).`}
+            hint={t("mandate.tradePctHint")?.replace("{size}", fmtSol(acct.perTradeSizeSol))}
           />
           <SliderRow
-            label="Giữ lại (reserve)"
+            label={t("mandate.reserveLabel")}
             icon={<Lock className="size-3.5 text-emerald-400" />}
             value={mandate.reserveSol}
             unit="SOL"
-            min={0}
+            min={minReserveSol}
             max={5}
             step={0.01}
             onChange={(v) => patch({ reserveSol: v })}
             accent="accent-emerald-500"
-            hint="SOL luôn chừa lại (phí gas + đệm), không bao giờ đem mua."
+            hint={t("mandate.reserveHint")?.replace("{min}", minReserveSol.toString())}
           />
           <SliderRow
-            label="Số vị thế mở tối đa"
+            label={t("mandate.positionsLabel")}
             icon={<Layers className="size-3.5 text-sky-400" />}
             value={mandate.maxOpenPositions}
-            unit="vị thế"
+            unit={t("mandate.positionsUnit")}
             min={1}
             max={50}
             step={1}
@@ -447,7 +506,7 @@ export function MandatePanel() {
           <Separator className="opacity-30" />
 
           <SliderRow
-            label="Cắt lỗ danh mục (drawdown)"
+            label={t("mandate.drawdownLabel")}
             icon={<TrendingDown className="size-3.5 text-red-400" />}
             value={mandate.maxDrawdownPct}
             unit="%"
@@ -456,10 +515,10 @@ export function MandatePanel() {
             step={1}
             onChange={(v) => patch({ maxDrawdownPct: v })}
             accent="accent-red-500"
-            hint="Dừng vào lệnh mới khi tổng lỗ (đã+chưa chốt) chạm ngưỡng này so với vốn gốc."
+            hint={t("mandate.drawdownHint")}
           />
           <SliderRow
-            label="Giới hạn lỗ trong ngày"
+            label={t("mandate.dailyLossLabel")}
             icon={<TrendingDown className="size-3.5 text-red-400" />}
             value={mandate.dailyLossLimitPct}
             unit="%"
@@ -468,19 +527,19 @@ export function MandatePanel() {
             step={1}
             onChange={(v) => patch({ dailyLossLimitPct: v })}
             accent="accent-red-500"
-            hint="Dừng vào lệnh mới trong ngày khi lỗ đã chốt vượt ngưỡng này."
+            hint={t("mandate.dailyLossHint")}
           />
 
           {/* Breach action */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-300">
-              Khi chạm ngưỡng cắt lỗ danh mục
+              {t("mandate.breachActionLabel")}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {(
                 [
-                  { k: "halt", label: "Chỉ dừng mua" },
-                  { k: "halt-and-liquidate", label: "Dừng + bán hết" },
+                  { k: "halt", label: t("mandate.breachHalt") },
+                  { k: "halt-and-liquidate", label: t("mandate.breachLiquidate") },
                 ] as { k: DrawdownBreachAction; label: string }[]
               ).map((o) => (
                 <button
@@ -499,8 +558,8 @@ export function MandatePanel() {
             </div>
             <p className="text-xs text-zinc-600">
               {mandate.onDrawdownBreach === "halt-and-liquidate"
-                ? "Khi thủng ngưỡng, bot sẽ bán hết các vị thế (giữ lại moon bag nếu có)."
-                : "Khi thủng ngưỡng, bot chỉ ngừng mua mới; vị thế đang giữ vẫn theo chiến lược bán."}
+                ? t("mandate.breachLiquidateDesc")
+                : t("mandate.breachHaltDesc")}
             </p>
           </div>
 
@@ -511,7 +570,7 @@ export function MandatePanel() {
             className="flex items-center gap-2 rounded-xl bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-700 disabled:opacity-60"
           >
             <Save className="size-4" />
-            Lưu cấu hình
+            {t("mandate.saveConfig")}
           </button>
         </CardContent>
       </Card>
@@ -520,7 +579,7 @@ export function MandatePanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-100">
-            Điều khiển uỷ thác
+            {t("mandate.controlsTitle")}
           </h2>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -533,7 +592,7 @@ export function MandatePanel() {
                 className="flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-emerald-400 disabled:opacity-60"
               >
                 <Play className="size-4" />
-                {mandate.status === "paused" ? "Tiếp tục uỷ thác" : "Bắt đầu uỷ thác"}
+                {mandate.status === "paused" ? t("mandate.resumeMandate") : t("mandate.startMandate")}
               </button>
             )}
             {mandate.status === "active" && (
@@ -544,7 +603,7 @@ export function MandatePanel() {
                 className="flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-amber-400 disabled:opacity-60"
               >
                 <Pause className="size-4" />
-                Tạm dừng
+                {t("mandate.pauseMandate")}
               </button>
             )}
             {mandate.status !== "stopped" && (
@@ -555,7 +614,7 @@ export function MandatePanel() {
                 className="flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-950/30 px-5 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-red-950/50 disabled:opacity-60"
               >
                 <Square className="size-4" />
-                Dừng & rút
+                {t("mandate.stopMandate")}
               </button>
             )}
           </div>
@@ -563,10 +622,8 @@ export function MandatePanel() {
           <p className="flex items-start gap-1.5 text-xs text-zinc-600">
             <Info className="size-3 mt-0.5 shrink-0" />
             <span>
-              <strong className="text-zinc-500">Tạm dừng</strong>: ngừng mua mới, vị thế
-              đang giữ vẫn được quản lý bán.{" "}
-              <strong className="text-zinc-500">Dừng &amp; rút</strong>: ngừng hẳn, có thể
-              bán hết vị thế để thu về SOL.
+              {t("mandate.pauseNote")}{" "}
+              {t("mandate.stopNote")}
             </span>
           </p>
         </CardContent>
@@ -578,14 +635,13 @@ export function MandatePanel() {
           <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
             <div className="flex items-center gap-2 text-red-400">
               <AlertTriangle className="size-5" />
-              <h3 className="text-base font-bold">Dừng uỷ thác?</h3>
+              <h3 className="text-base font-bold">{t("mandate.stopConfirmTitle")}</h3>
             </div>
             <p className="mt-3 text-sm text-zinc-400">
-              Bot sẽ ngừng mua mới ngay lập tức. Bạn có muốn bán hết{" "}
-              {acct.openCount} vị thế đang mở để thu về SOL không?
+              {t("mandate.stopConfirmBody")?.replace("{count}", acct.openCount.toString())}
             </p>
             <p className="mt-2 text-xs text-zinc-600">
-              (Phần moon bag — tỷ lệ giữ lại tự bán tay — vẫn được giữ nguyên.)
+              {t("mandate.stopConfirmMoonbag")}
             </p>
             <div className="mt-5 flex flex-col gap-2">
               <button
@@ -595,7 +651,7 @@ export function MandatePanel() {
                 className="flex items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-red-400 disabled:opacity-60"
               >
                 <Square className="size-4" />
-                Dừng &amp; bán hết vị thế
+                {t("mandate.stopAndSell")}
               </button>
               <button
                 type="button"
@@ -603,7 +659,7 @@ export function MandatePanel() {
                 disabled={saving}
                 className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:bg-zinc-700 disabled:opacity-60"
               >
-                Chỉ dừng, giữ nguyên vị thế
+                {t("mandate.stopKeepPositions")}
               </button>
               <button
                 type="button"
@@ -611,7 +667,7 @@ export function MandatePanel() {
                 disabled={saving}
                 className="rounded-xl px-4 py-2 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-300"
               >
-                Huỷ
+                {t("common.cancel")}
               </button>
             </div>
           </div>
@@ -624,15 +680,12 @@ export function MandatePanel() {
           <div className="flex gap-3">
             <ShieldCheck className="size-5 shrink-0 text-amber-500/60 mt-0.5" />
             <div className="space-y-1 text-xs text-zinc-500">
-              <p className="font-medium text-zinc-400">Lưu ý an toàn</p>
+              <p className="font-medium text-zinc-400">{t("mandate.securityNote")}</p>
               <p>
-                Vốn gốc là giới hạn <em>phần mềm</em> — bot tự kỷ luật không tiêu quá số
-                này. Solana không có cơ chế hạn mức on-chain như EVM, nên nếu server bị
-                xâm nhập, key vẫn có thể tiêu toàn bộ ví.
+                {t("mandate.securityNoteBody") || "Vốn gốc là giới hạn phần mềm — bot tự kỷ luật không tiêu quá số này. Solana không có cơ chế hạn mức on-chain như EVM, nên nếu server bị xâm nhập, key vẫn có thể tiêu toàn bộ ví."}
               </p>
               <p className="text-amber-500/80">
-                Khuyến nghị: chỉ nạp đúng số SOL bạn muốn uỷ thác vào ví này (tư duy ví
-                burner).
+                {t("mandate.securityNoteWarning") || "Khuyến nghị: chỉ nạp đúng số SOL bạn muốn uỷ thác vào ví này (tư duy ví burner)."}
               </p>
             </div>
           </div>

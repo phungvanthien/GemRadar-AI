@@ -10,7 +10,7 @@ import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import type { SellStrategy } from "./settings-store";
 
-const STORE_PATH = path.join(process.cwd(), "alphahunter-positions.json");
+const STORE_PATH = path.join(process.cwd(), "gemradar-positions.json");
 
 export type PositionStatus = "open" | "closed";
 export type FillKind = "buy" | "sell";
@@ -28,6 +28,10 @@ export interface Fill {
   // Set when a live tx failed; the fill is recorded for audit but must NOT
   // advance soldPct / remainingPct.
   error?: string;
+  // Stable machine code classifying `error` (GuardError.code, or `${status}` for
+  // a SendOutcome). Used to tell a genuine "can't be sold" rug signal apart from
+  // a transient infra failure — never match the human-readable `error` string.
+  errorCode?: string;
   reason?: string; // exit reason for sells: "ladder-t2" | "stop-loss" | ...
 }
 
@@ -273,6 +277,92 @@ export function computeUnrealizedPnlSol(pos: Position, currentPriceUsd: number):
   const remainingEntrySol = pos.entrySol * remainingPct;
   const currentValueSol = remainingEntrySol * (currentPriceUsd / pos.entryPriceUsd);
   return currentValueSol - remainingEntrySol;
+}
+
+// Error codes that genuinely mean "this token cannot be sold" — the only signals
+// that may count toward a rugpull write-off. Everything else (transient Jupiter
+// host/HTTP failures, RPC hiccups, and especially "unknown" outcomes where the tx
+// MAY have landed) is infrastructure noise and must NOT be read as a rug.
+//
+//  - quote-no-route : Jupiter has no swap route back to SOL (classic rug symptom)
+//  - price-impact   : the only route left would move price past the cap (dead pool)
+//  - failed:*       : the swap tx was provably rejected on-chain (SendOutcome
+//                     "failed"). "unknown:*" is deliberately excluded.
+export function isRugSellSignal(f: Fill): boolean {
+  if (!f.error) return false;
+  const code = f.errorCode;
+  if (!code) return false; // unclassified → treat as transient, never a rug
+  if (code === "quote-no-route" || code === "price-impact") return true;
+  if (code.startsWith("failed:")) return true;
+  return false;
+}
+
+// How many "token can't be sold" signals have accrued back-to-back since the last
+// successful (advancing) fill. Derived from the fills log so the count survives a
+// worker restart. A rugpulled token produces a run of no-route / price-impact /
+// on-chain-rejected sells; once this run reaches a threshold the exit engine
+// writes the position off.
+//
+// CRITICAL: only genuine rug signals (see isRugSellSignal) are counted. A
+// transient infra failure between rug signals is SKIPPED (it neither increments
+// the run nor resets it) so a Jupiter outage can't manufacture a false rugpull,
+// and a flaky tick in the middle of a real rug can't mask it. Any advancing
+// (non-errored) sell resets the run to 0.
+export function consecutiveSellFails(pos: Position): number {
+  let run = 0;
+  for (let i = pos.fills.length - 1; i >= 0; i--) {
+    const f = pos.fills[i];
+    if (f.kind !== "sell") continue;
+    if (f.reason === "reconcile") continue; // bookkeeping, not a trade attempt
+    if (!f.error) break; // an advancing (successful) sell ends the run
+    if (isRugSellSignal(f)) {
+      run += 1;
+    }
+    // else: transient infra failure — skip it, don't count and don't break.
+  }
+  return run;
+}
+
+// Write a position off as a total loss on the UNSOLD remainder — used when a
+// token can no longer be sold (rugpull: no swap route or price impact too high).
+// The remaining entry capital is booked as a realized loss so mandate equity,
+// drawdown and the P&L curve reflect reality, and the position is closed so its
+// slot and deployed capital are freed for new entries. The moon-bag hold is NOT
+// honored here: a rugpulled token's "hold" is worthless, so the full remaining
+// position is written off.
+export async function writeOffPosition(
+  positionId: string,
+  reason = "rugpull",
+  now = new Date(),
+): Promise<Position | null> {
+  const store = await readStore();
+  const pos = store.positions[positionId];
+  if (!pos || pos.status === "closed") return null;
+
+  const remainingPct = Math.max(0, 100 - pos.soldPct);
+  const lostSol = pos.entrySol * (remainingPct / 100);
+
+  pos.fills.push({
+    time: now.toISOString(),
+    kind: "sell",
+    pct: remainingPct,
+    priceUsd: 0, // sold for nothing
+    sol: 0, // recovered nothing
+    tokenAmount: 0,
+    txSig: null,
+    dryRun: pos.mode !== "live",
+    reason,
+  });
+
+  pos.soldPct = 100;
+  pos.realizedPnlSol -= lostSol;
+  pos.status = "closed";
+  pos.closedReason = reason;
+  pos.closedTime = now.toISOString();
+
+  store.positions[positionId] = pos;
+  await writeStore(store);
+  return pos;
 }
 
 // Which ladder tier ids have already been filled — derived from the fills log so

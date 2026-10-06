@@ -1,5 +1,5 @@
 {
-  "name": "alphahunter-ai",
+  "name": "gemradar-ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,8 @@
     "lint": "eslint",
     "trade-worker": "node scripts/trade-worker/worker.mjs",
     "sim-worker": "node scripts/sim-worker/worker.mjs",
-    "outcome-worker": "node scripts/outcome-worker/worker.mjs"
+    "outcome-worker": "node scripts/outcome-worker/worker.mjs",
+    "watch-worker": "node scripts/watch-worker/worker.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",
@@ -22,11 +23,13 @@
     "bs58": "6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.7",
     "openai": "^6.42.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "recharts": "^3.10.1",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {

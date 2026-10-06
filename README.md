@@ -1,4 +1,4 @@
-# AlphaHunter AI
+# GemRadar AI
 
 Production-ready crypto intelligence dashboard with AI chat, live market widgets, and a **Hidden Gems** scanner powered by CoinMarketCap + Claude (via FridayAIX).
 
@@ -32,7 +32,7 @@ Production-ready crypto intelligence dashboard with AI chat, live market widgets
 ### 1. Clone and install
 
 ```bash
-cd alphahunter-ai
+cd gemradar-ai
 npm install
 ```
 

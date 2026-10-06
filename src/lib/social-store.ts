@@ -24,6 +24,7 @@ import type { SocialSignals } from "./gem-score";
 import {
   filterTelegramGroup,
   filterXAccount,
+  filterXBuzz,
   applyGroupSpamDiscount,
   applyXSpamDiscount,
   type TelegramGroupSignals,
@@ -137,18 +138,32 @@ function mergeSignals(
   // ── X / Twitter ──
   // Only trust an xScore from a clean scrape (no error).
   if (x && !x.error && typeof x.xScore === "number") {
-    const accountVerdict = filterXAccount({
-      accountAgeDays: x.accountAgeDays ?? null,
-      followers: x.followers ?? null,
-      following: x.following ?? null,
-      tweetCount: x.tweetCount,
-      verified: x.verified ?? false,
-      avgEngagementPerTweet: x.avgEngagementPerTweet ?? x.avgEngagement ?? null,
-    });
-    const discounted = applyXSpamDiscount(x.xScore, accountVerdict);
+    // Pick the filter by source. The Nitter RSS path is a $SYMBOL buzz search
+    // across many authors with no single profile, so account-level signals
+    // (age, follower ratio) are absent — use the buzz-level filter. The
+    // official X API path resolves one profile, so use the account filter.
+    const hasAccountSignals =
+      x.accountAgeDays != null || x.followers != null || x.following != null;
+    const verdict =
+      x.source === "scrape" && hasAccountSignals
+        ? filterXAccount({
+            accountAgeDays: x.accountAgeDays ?? null,
+            followers: x.followers ?? null,
+            following: x.following ?? null,
+            tweetCount: x.tweetCount,
+            verified: x.verified ?? false,
+            avgEngagementPerTweet: x.avgEngagementPerTweet ?? x.avgEngagement ?? null,
+          })
+        : filterXBuzz({
+            tweetCount: x.tweetCount,
+            uniqueAuthors: x.uniqueAuthors,
+            avgEngagement: x.avgEngagement,
+            recentTweets: x.recentTweets,
+          });
+    const discounted = applyXSpamDiscount(x.xScore, verdict);
     // Write back for UI / logging.
-    x.spamFlags = accountVerdict.flags;
-    x.authenticityScore = accountVerdict.authenticityScore;
+    x.spamFlags = verdict.flags;
+    x.authenticityScore = verdict.authenticityScore;
     signals.xScore = discounted;
   }
 

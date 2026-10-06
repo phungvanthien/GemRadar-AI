@@ -1,0 +1,451 @@
+{
+  "positions": {
+    "wsosWQDzBHibcjJefnfjd7VHQcReZQhhUNTxxgmEhar-1791106970945": {
+      "id": "wsosWQDzBHibcjJefnfjd7VHQcReZQhhUNTxxgmEhar-1791106970945",
+      "mint": "wsosWQDzBHibcjJefnfjd7VHQcReZQhhUNTxxgmEhar",
+      "symbol": "WSOS",
+      "status": "closed",
+      "mode": "live",
+      "entryPriceUsd": 0.0029002689393489243,
+      "entrySol": 0.027500000000000004,
+      "tokenAmount": 1104.330898,
+      "decimals": 6,
+      "entryTime": "2026-10-04T09:42:50.945Z",
+      "sellStrategy": {
+        "enabled": true,
+        "mode": "ladder",
+        "tiers": [
+          {
+            "id": "t2",
+            "multiplier": 2,
+            "sellPercent": 76
+          },
+          {
+            "id": "t4",
+            "multiplier": 4,
+            "sellPercent": 10
+          },
+          {
+            "id": "t6",
+            "multiplier": 6,
+            "sellPercent": 5
+          },
+          {
+            "id": "t8",
+            "multiplier": 8,
+            "sellPercent": 5
+          },
+          {
+            "id": "t10",
+            "multiplier": 10,
+            "sellPercent": 4
+          }
+        ],
+        "singleTargetMultiplier": 3,
+        "trailingStopPercent": 20,
+        "trailingActivateMultiplier": 2,
+        "stopLossPercent": 35,
+        "maxHoldMinutes": 0,
+        "manualHoldPercent": 5
+      },
+      "peakPriceUsd": 0.003046310374927103,
+      "trailingArmed": false,
+      "fills": [
+        {
+          "time": "2026-10-04T09:42:50.945Z",
+          "kind": "buy",
+          "pct": 100,
+          "priceUsd": 0.0029002689393489243,
+          "sol": 0.027500000000000004,
+          "tokenAmount": 1104.330898,
+          "txSig": "3GxNczpC3eLcCFNQnuQATk93HhjuKs2ATgZoEw7PbuH918nLsd1ALBq8fTcCUSAfiWUHsgF5SE58s9dZsjwG8r97",
+          "dryRun": false
+        },
+        {
+          "time": "2026-10-05T11:07:24.464Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        },
+        {
+          "time": "2026-10-05T13:06:29.642Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        },
+        {
+          "time": "2026-10-05T15:05:27.539Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        },
+        {
+          "time": "2026-10-06T16:17:14.540Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "reason": "manual-writeoff"
+        }
+      ],
+      "soldPct": 100,
+      "realizedPnlSol": -0.027500000000000004,
+      "reopenedFrom": "manual-writeoff",
+      "reopenedAt": "2026-10-05T08:14:49.406Z",
+      "closedReason": "manual-writeoff",
+      "closedTime": "2026-10-06T16:17:14.540Z"
+    },
+    "DWrrbYP65oo33Fk83iaQVHQhytntFM1uooyJHjaxpump-1791106970945": {
+      "id": "DWrrbYP65oo33Fk83iaQVHQhytntFM1uooyJHjaxpump-1791106970945",
+      "mint": "DWrrbYP65oo33Fk83iaQVHQhytntFM1uooyJHjaxpump",
+      "symbol": "CEZ",
+      "status": "closed",
+      "mode": "live",
+      "entryPriceUsd": 0.0009270642797903853,
+      "entrySol": 0.027500000000000004,
+      "tokenAmount": 3514.560145,
+      "decimals": 6,
+      "entryTime": "2026-10-04T09:42:50.945Z",
+      "sellStrategy": {
+        "enabled": true,
+        "mode": "ladder",
+        "tiers": [
+          {
+            "id": "t2",
+            "multiplier": 2,
+            "sellPercent": 76
+          },
+          {
+            "id": "t4",
+            "multiplier": 4,
+            "sellPercent": 10
+          },
+          {
+            "id": "t6",
+            "multiplier": 6,
+            "sellPercent": 5
+          },
+          {
+            "id": "t8",
+            "multiplier": 8,
+            "sellPercent": 5
+          },
+          {
+            "id": "t10",
+            "multiplier": 10,
+            "sellPercent": 4
+          }
+        ],
+        "singleTargetMultiplier": 3,
+        "trailingStopPercent": 20,
+        "trailingActivateMultiplier": 2,
+        "stopLossPercent": 35,
+        "maxHoldMinutes": 0,
+        "manualHoldPercent": 5
+      },
+      "peakPriceUsd": 0.0009407603468144438,
+      "trailingArmed": false,
+      "fills": [
+        {
+          "time": "2026-10-04T09:42:50.945Z",
+          "kind": "buy",
+          "pct": 100,
+          "priceUsd": 0.0009270642797903853,
+          "sol": 0.027500000000000004,
+          "tokenAmount": 3514.560145,
+          "txSig": "4BY7wqt7UG1sNM95N3AWB3kS5q16MuTHHQboA3U94FAdkQ8N6joSfdSmwcHcRQG9wHis43EuJD8gpeYMMgVMjyAK",
+          "dryRun": false
+        },
+        {
+          "time": "2026-10-04T09:51:38.591Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "reason": "manual-writeoff"
+        },
+        {
+          "time": "2026-10-05T11:07:24.464Z",
+          "kind": "sell",
+          "pct": 0,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        }
+      ],
+      "soldPct": 100,
+      "realizedPnlSol": -0.027500000000000004,
+      "closedReason": "rugpull-probe",
+      "closedTime": "2026-10-05T11:07:24.464Z"
+    },
+    "CYZgj7N87PW5BvSyAPPqZm9d3Txnuo5gTk3p5fCReCTF-1791134511056": {
+      "id": "CYZgj7N87PW5BvSyAPPqZm9d3Txnuo5gTk3p5fCReCTF-1791134511056",
+      "mint": "CYZgj7N87PW5BvSyAPPqZm9d3Txnuo5gTk3p5fCReCTF",
+      "symbol": "ECTF",
+      "status": "closed",
+      "mode": "live",
+      "entryPriceUsd": 0.000272824143172752,
+      "entrySol": 0.03125,
+      "tokenAmount": 13396.749213,
+      "decimals": 6,
+      "entryTime": "2026-10-04T17:21:51.056Z",
+      "sellStrategy": {
+        "enabled": true,
+        "mode": "ladder",
+        "tiers": [
+          {
+            "id": "t2",
+            "multiplier": 2,
+            "sellPercent": 76
+          },
+          {
+            "id": "t4",
+            "multiplier": 4,
+            "sellPercent": 10
+          },
+          {
+            "id": "t6",
+            "multiplier": 6,
+            "sellPercent": 5
+          },
+          {
+            "id": "t8",
+            "multiplier": 8,
+            "sellPercent": 5
+          },
+          {
+            "id": "t10",
+            "multiplier": 10,
+            "sellPercent": 4
+          }
+        ],
+        "singleTargetMultiplier": 3,
+        "trailingStopPercent": 20,
+        "trailingActivateMultiplier": 2,
+        "stopLossPercent": 35,
+        "maxHoldMinutes": 0,
+        "manualHoldPercent": 5
+      },
+      "peakPriceUsd": 0.000272824143172752,
+      "trailingArmed": false,
+      "fills": [
+        {
+          "time": "2026-10-04T17:21:51.056Z",
+          "kind": "buy",
+          "pct": 100,
+          "priceUsd": 0.000272824143172752,
+          "sol": 0.03125,
+          "tokenAmount": 13396.749213,
+          "txSig": "3EM8ySBrVo9ugbToBFmMGnQTMBwAtcTbQXyXQs9UnFX8btvLpH4TEY8grb93iZmwwauF8GGdMzExkHJqrqA37rgc",
+          "dryRun": false
+        },
+        {
+          "time": "2026-10-05T08:15:57.978Z",
+          "kind": "sell",
+          "pct": 95,
+          "priceUsd": 3.422428037760232e-7,
+          "sol": 0,
+          "tokenAmount": 12726.911752349999,
+          "txSig": null,
+          "dryRun": false,
+          "error": "Jupiter quote failed: HTTP 400",
+          "reason": "stop-loss"
+        },
+        {
+          "time": "2026-10-05T08:16:05.979Z",
+          "kind": "sell",
+          "pct": 95,
+          "priceUsd": 3.422428037760232e-7,
+          "sol": 0,
+          "tokenAmount": 12726.911752349999,
+          "txSig": null,
+          "dryRun": false,
+          "error": "Jupiter quote failed: HTTP 400",
+          "reason": "stop-loss"
+        },
+        {
+          "time": "2026-10-05T08:16:13.980Z",
+          "kind": "sell",
+          "pct": 95,
+          "priceUsd": 3.422428037760232e-7,
+          "sol": 0,
+          "tokenAmount": 12726.911752349999,
+          "txSig": null,
+          "dryRun": false,
+          "error": "Jupiter quote failed: HTTP 400",
+          "reason": "stop-loss"
+        },
+        {
+          "time": "2026-10-05T08:16:13.980Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "reason": "rugpull"
+        }
+      ],
+      "soldPct": 100,
+      "realizedPnlSol": -0.03125,
+      "reopenedFrom": "manual-writeoff",
+      "reopenedAt": "2026-10-05T08:14:49.406Z",
+      "closedReason": "rugpull",
+      "closedTime": "2026-10-05T08:16:13.980Z"
+    },
+    "HKZDfZnkHZxd9agRDNPyDv4iT6LmAurJnpRtj9wpump-1791188654604": {
+      "id": "HKZDfZnkHZxd9agRDNPyDv4iT6LmAurJnpRtj9wpump-1791188654604",
+      "mint": "HKZDfZnkHZxd9agRDNPyDv4iT6LmAurJnpRtj9wpump",
+      "symbol": "MISTAKE",
+      "status": "closed",
+      "mode": "live",
+      "entryPriceUsd": 0.004104421244912278,
+      "entrySol": 0.03875000000000001,
+      "tokenAmount": 1142.148887,
+      "decimals": 6,
+      "entryTime": "2026-10-05T08:24:14.604Z",
+      "sellStrategy": {
+        "enabled": true,
+        "mode": "ladder",
+        "tiers": [
+          {
+            "id": "t2",
+            "multiplier": 2,
+            "sellPercent": 76
+          },
+          {
+            "id": "t4",
+            "multiplier": 4,
+            "sellPercent": 10
+          },
+          {
+            "id": "t6",
+            "multiplier": 6,
+            "sellPercent": 5
+          },
+          {
+            "id": "t8",
+            "multiplier": 8,
+            "sellPercent": 5
+          },
+          {
+            "id": "t10",
+            "multiplier": 10,
+            "sellPercent": 4
+          }
+        ],
+        "singleTargetMultiplier": 3,
+        "trailingStopPercent": 20,
+        "trailingActivateMultiplier": 2,
+        "stopLossPercent": 35,
+        "maxHoldMinutes": 0,
+        "manualHoldPercent": 5
+      },
+      "peakPriceUsd": 0.0046162759137227645,
+      "trailingArmed": false,
+      "fills": [
+        {
+          "time": "2026-10-05T08:24:14.604Z",
+          "kind": "buy",
+          "pct": 100,
+          "priceUsd": 0.004104421244912278,
+          "sol": 0.03875000000000001,
+          "tokenAmount": 1142.148887,
+          "txSig": "5U5rSEUnxzyyzt2sRzP7HuyHi6sXB6sWR8C8HS46CxvSJ5KW1ZwXTmczx3cTYvBffAJfmmQYQe391Jf9BGgyeG7Z",
+          "dryRun": false
+        },
+        {
+          "time": "2026-10-05T11:07:24.464Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        },
+        {
+          "time": "2026-10-05T13:06:29.642Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        },
+        {
+          "time": "2026-10-05T15:05:27.539Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "error": "fetch failed",
+          "errorCode": "exception",
+          "reason": "rugpull-probe"
+        },
+        {
+          "time": "2026-10-06T16:17:04.044Z",
+          "kind": "sell",
+          "pct": 100,
+          "priceUsd": 0,
+          "sol": 0,
+          "tokenAmount": 0,
+          "txSig": null,
+          "dryRun": false,
+          "reason": "manual-writeoff"
+        }
+      ],
+      "soldPct": 100,
+      "realizedPnlSol": -0.03875000000000001,
+      "closedReason": "manual-writeoff",
+      "closedTime": "2026-10-06T16:17:04.044Z"
+    }
+  },
+  "daily": {
+    "date": "2026-10-05",
+    "tradesOpened": 1
+  }
+}

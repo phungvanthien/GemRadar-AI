@@ -3,9 +3,9 @@ import { MandatePanel } from "@/components/dashboard/mandate-panel";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Uỷ thác | AlphaHunter AI",
+  title: "Mandate | GemRadar AI",
   description:
-    "Uỷ thác vốn SOL cho bot tự săn gems với giới hạn phân bổ và quản trị rủi ro danh mục",
+    "Capital allocation for auto-trading gems with limits and portfolio risk management",
 };
 
 export default function MandatePage() {

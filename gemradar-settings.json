@@ -1,0 +1,49 @@
+{
+  "buyVolumeSol": 0.05,
+  "autoBuyEnabled": true,
+  "minGemScoreToTrigger": 80,
+  "telegramAccounts": [],
+  "xAccounts": [],
+  "socialWeights": {
+    "telegram": 0,
+    "x": 100
+  },
+  "sellStrategy": {
+    "enabled": true,
+    "mode": "ladder",
+    "tiers": [
+      {
+        "id": "t2",
+        "multiplier": 2,
+        "sellPercent": 76
+      },
+      {
+        "id": "t4",
+        "multiplier": 4,
+        "sellPercent": 10
+      },
+      {
+        "id": "t6",
+        "multiplier": 6,
+        "sellPercent": 5
+      },
+      {
+        "id": "t8",
+        "multiplier": 8,
+        "sellPercent": 5
+      },
+      {
+        "id": "t10",
+        "multiplier": 10,
+        "sellPercent": 4
+      }
+    ],
+    "singleTargetMultiplier": 3,
+    "trailingStopPercent": 20,
+    "trailingActivateMultiplier": 2,
+    "stopLossPercent": 35,
+    "maxHoldMinutes": 0,
+    "manualHoldPercent": 5
+  },
+  "updatedAt": "2026-10-04T16:10:55.698Z"
+}

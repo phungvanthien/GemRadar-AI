@@ -262,6 +262,9 @@ function applyOutcome(fill: Fill, outcome: SendOutcome): Fill {
     ...fill,
     txSig: outcome.sig,
     error: `${outcome.status}:${outcome.reason}`,
+    // "unknown" = tx may have landed; "failed" = provably did not. Only an
+    // on-chain "failed" is a candidate rug signal — "unknown" never is.
+    errorCode: outcome.status === "failed" ? `failed:${outcome.reason}` : outcome.status,
   };
 }
 
@@ -377,4 +380,35 @@ export async function sell(
     reason,
   };
   return { quote, outcome: outcome.status, fill: applyOutcome(baseFill, outcome) };
+}
+
+// Derive a token's USD price from a SELL quote (token -> WSOL), as a FALLBACK for
+// when Jupiter Price API v3 omits the mint (a transient feed gap). This mirrors
+// exactly what a real exit would receive, so a token that is quotable here is
+// genuinely sellable — the key signal that distinguishes a feed gap from a rug.
+//
+// Issues one read-only quote request, never signs or sends. Returns null when
+// there is no route (a real "can't be sold" signal) or on any error. The caller
+// supplies solUsdPrice from a reliable source (WSOL is always in Price v3).
+export async function quotePriceUsd(
+  mint: string,
+  tokenUiAmount: number,
+  decimals: number,
+  solUsdPrice: number,
+  cfg: TradeConfig = getTradeConfig(),
+): Promise<number | null> {
+  if (!(tokenUiAmount > 0) || !(solUsdPrice > 0)) return null;
+  const amountBaseUnits = Math.floor(tokenUiAmount * 10 ** decimals).toString();
+  try {
+    const quote = await getQuote(mint, WSOL_MINT, amountBaseUnits, cfg);
+    const solOut = Number(quote.outAmount) / LAMPORTS_PER_SOL;
+    if (!(solOut > 0)) return null;
+    // USD per token = (SOL received for the whole amount * SOL/USD) / tokens sold.
+    return (solOut * solUsdPrice) / tokenUiAmount;
+  } catch {
+    // No route / HTTP error — caller treats null as "still no price". A genuine
+    // no-route here is the correct rug signal; a transient HTTP error just means
+    // we retry next tick (same as before this fallback existed).
+    return null;
+  }
 }

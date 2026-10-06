@@ -18,6 +18,36 @@ import { mkdtempSync, rmSync, readdirSync, readFileSync, writeFileSync } from "n
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+const root = fileURLToPath(new URL("../..", import.meta.url));
+
+// Minimal env loader since this runs outside Next.js
+try {
+  const envText = readFileSync(join(root, ".env.local"), "utf8");
+  for (const line of envText.split("\n")) {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+    if (match) {
+      let val = match[2] || "";
+      if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+      else if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
+      if (!(match[1] in process.env)) process.env[match[1]] = val;
+    }
+  }
+} catch (e) {
+  // Ignore if .env.local doesn't exist
+}
+try {
+  const envText = readFileSync(join(root, ".env"), "utf8");
+  for (const line of envText.split("\n")) {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+    if (match) {
+      let val = match[2] || "";
+      if (val.startsWith('"') && val.endsWith('"')) val = val.slice(1, -1);
+      else if (val.startsWith("'") && val.endsWith("'")) val = val.slice(1, -1);
+      if (!(match[1] in process.env)) process.env[match[1]] = val;
+    }
+  }
+} catch (e) {}
+
 // tsc (moduleResolution=bundler) emits extensionless relative imports; Node ESM
 // needs explicit `.js`. Rewrite them in the flattened output.
 function addJsExtensions(dir) {
@@ -33,7 +63,6 @@ function addJsExtensions(dir) {
   }
 }
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
 // Compile INSIDE the project so Node resolves node_modules (@solana/web3.js is
 // needed at runtime by the live swap path reachable from the import graph).
 const outDir = mkdtempSync(join(root, "node_modules", ".trade-worker-"));
@@ -54,6 +83,7 @@ try {
     join(root, "node_modules/.bin/tsc"),
     [
       "src/lib/trade-exit.ts",
+      "src/lib/rugcheck-socket.ts",
       "--outDir",
       outDir,
       "--module",
@@ -80,6 +110,9 @@ const { monitorPositions } = await import(
 const { getTradeConfig } = await import(
   pathToFileURL(join(outDir, "trade-config.js")).href
 );
+const { connectRugcheckSocket } = await import(
+  pathToFileURL(join(outDir, "rugcheck-socket.js")).href
+);
 
 const cfg = getTradeConfig();
 log(`mode=${cfg.mode} (dry-run unless TRADE_MODE=live AND autoBuyEnabled AND key loaded)`);
@@ -100,17 +133,26 @@ async function exitTick() {
 // duplicating the enrich→score pipeline here.
 async function entryTick() {
   try {
+    // Only send tokens seen in the last 30 minutes
+    const now = Date.now();
+    const validTokens = workerRecentMints
+      .filter((t) => now - t.seenAt < 30 * 60_000)
+      .slice(0, MAX_SCAN_TOKENS)
+      .map(({ mint, symbol, name }) => ({ mint, symbol, name }));
+
+    const payload = validTokens.length > 0 ? { tokens: validTokens } : {};
+
     const res = await fetch(SCAN_URL, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: "{}",
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       log(`scan HTTP ${res.status} (is the Next app running?)`);
       return;
     }
     const data = await res.json();
-    log(`scan ok: ${data.gems?.length ?? 0} gems scored`);
+    log(`scan ok: ${data.gems?.length ?? 0} gems scored (sent ${validTokens.length})`);
   } catch (e) {
     log("entry scan unreachable:", e?.message ?? e, "(exit monitor still running)");
   }
@@ -118,6 +160,49 @@ async function entryTick() {
 
 const exitTimer = setInterval(exitTick, EXIT_INTERVAL_MS);
 const entryTimer = setInterval(entryTick, ENTRY_INTERVAL_MS);
+
+// ── Background scanner for tokens when running headless ──
+// If the user hasn't opened the dashboard, the Next.js API's recentMints buffer
+// stays empty. We maintain our own buffer here and post it to the scanner.
+const MAX_SCAN_TOKENS = 15;
+let workerRecentMints = [];
+
+function startRugcheckScanner() {
+  log("starting background rugcheck stream...");
+  connectRugcheckSocket({
+    onOpen: () => log("rugcheck stream connected"),
+    onEvent: (event) => {
+      const raw = event.raw;
+      const meta = raw.tokenMeta || {};
+      const num = (v) => (typeof v === "number" ? v : null);
+
+      const score = num(raw.score_normalised) ?? 0;
+      // Pre-filter exactly like getRecentMints to avoid spamming the Next API
+      if (score > 60) return;
+
+      const token = {
+        mint: event.mint,
+        symbol: typeof meta.symbol === "string" ? meta.symbol : "",
+        name: typeof meta.name === "string" ? meta.name : "",
+        seenAt: Date.now(),
+      };
+
+      const existingIdx = workerRecentMints.findIndex((t) => t.mint === token.mint);
+      if (existingIdx !== -1) workerRecentMints.splice(existingIdx, 1);
+
+      workerRecentMints.unshift(token);
+      if (workerRecentMints.length > MAX_SCAN_TOKENS * 2) {
+        workerRecentMints.length = MAX_SCAN_TOKENS * 2;
+      }
+    },
+    onError: (msg) => log("rugcheck stream error:", msg),
+    onClose: (code, reason) => {
+      log("rugcheck stream closed:", code, reason, "- reconnecting in 5s");
+      if (!stopping) setTimeout(startRugcheckScanner, 5000);
+    }
+  });
+}
+startRugcheckScanner();
 
 // Kick both immediately.
 exitTick();

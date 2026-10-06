@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { LanguageProvider } from "@/lib/i18n/context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,12 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AlphaHunter AI | Crypto Intelligence Dashboard",
+  title: "GemRadar AI | Crypto Intelligence Dashboard",
   description:
     "AI-powered crypto dashboard with hidden gem scanner, market analytics, and intelligent token analysis.",
   keywords: ["crypto", "AI", "hidden gems", "CoinMarketCap", "trading"],
   openGraph: {
-    title: "AlphaHunter AI",
+    title: "GemRadar AI",
     description: "Discover hidden crypto gems with AI-powered analysis",
     type: "website",
   },
@@ -30,9 +31,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark h-full`}>
-      <body className="min-h-full bg-background font-sans text-foreground antialiased">
-        {children}
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark h-full`} suppressHydrationWarning>
+      <body className="min-h-full bg-background font-sans text-foreground antialiased" suppressHydrationWarning>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -84,10 +84,14 @@ async function buildAccounting(mandate: Mandate) {
 export async function GET() {
   try {
     const mandate = await loadMandate();
+    const cfg = getTradeConfig();
     const { acct, openCount, realizedTodaySol } = await buildAccounting(mandate);
     return NextResponse.json({
       mandate,
       accounting: { ...acct, openCount, realizedTodaySol, maxOpenPositions: mandate.maxOpenPositions },
+      // Server-enforced reserve floor (= operator wallet minimum). The UI uses it
+      // as the reserve slider's min so a client value can't be silently raised.
+      minReserveSol: cfg.minWalletSol,
     });
   } catch (error) {
     console.error("[/api/mandate GET]", error);
@@ -170,8 +174,14 @@ export async function POST(req: Request) {
     const principalSol = clampNum(body.principalSol, 0, 100000, current.principalSol);
 
     // Live guard: principal + reserve must not exceed the real wallet balance.
+    // Only runs when the operator is RAISING committed capital — lowering it, or
+    // editing unrelated risk fields (drawdown, maxOpen, breach action), never
+    // needs a balance check, so an RPC hiccup can't block those saves.
+    const raisingCommitted =
+      principalSol > current.principalSol + 1e-9 ||
+      reserveSol > current.reserveSol + 1e-9;
     const keypair = loadKeypairSafe();
-    if (cfg.mode === "live" && keypair) {
+    if (cfg.mode === "live" && keypair && raisingCommitted) {
       try {
         const conn = getConnection(cfg);
         const balance = await getBalanceSol(conn, new PublicKey(keypair.publicKey.toBase58()));
@@ -184,7 +194,8 @@ export async function POST(req: Request) {
           );
         }
       } catch (e) {
-        // Can't read balance — fail closed on raising principal in live mode.
+        // Can't read balance — fail closed on RAISING committed capital in live
+        // mode (never let an unverifiable increase through).
         return NextResponse.json(
           { error: `Không đọc được số dư ví để xác thực vốn uỷ thác: ${e instanceof Error ? e.message : "RPC error"}` },
           { status: 503 },
@@ -220,7 +231,7 @@ export async function POST(req: Request) {
       await recordMandateAudit({ action: "update", changes });
     }
 
-    return NextResponse.json({ ok: true, mandate: next });
+    return NextResponse.json({ ok: true, mandate: next, minReserveSol: cfg.minWalletSol });
   } catch (error) {
     console.error("[/api/mandate POST]", error);
     const message = error instanceof Error ? error.message : "Failed to update mandate";

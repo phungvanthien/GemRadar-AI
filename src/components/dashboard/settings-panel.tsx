@@ -23,9 +23,11 @@ import {
   Timer,
   Target,
   Hand,
+  Globe,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useLanguage } from "@/lib/i18n/context";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -176,6 +178,7 @@ function AccountRow({
   onDelete: () => void;
   showDelete: boolean;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-3">
       <div className="min-w-0">
@@ -192,7 +195,7 @@ function AccountRow({
               : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
           }`}
         >
-          {enabled ? "Bật" : "Tắt"}
+          {enabled ? (t("common.on") || "Đang bật") : (t("common.off") || "Đang tắt")}
         </button>
         {showDelete && (
           <button
@@ -211,6 +214,7 @@ function AccountRow({
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function SettingsPanel() {
+  const { language, setLanguage, t } = useLanguage();
   const [settings, setSettings] = useState<TradingSettings>(DEFAULT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -252,12 +256,12 @@ export function SettingsPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(next),
       });
-      if (!res.ok) throw new Error("Lưu thất bại");
+      if (!res.ok) throw new Error(t("settings.saveFailed"));
       setSaved(true);
       if (savedTimer.current) clearTimeout(savedTimer.current);
       savedTimer.current = setTimeout(() => setSaved(false), 3000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Lỗi không xác định");
+      setError(e instanceof Error ? e.message : t("settings.unknownError"));
     } finally {
       setSaving(false);
     }
@@ -396,10 +400,10 @@ export function SettingsPanel() {
         <div>
           <h1 className="flex items-center gap-2.5 text-xl font-bold text-zinc-50">
             <Settings className="size-5 text-amber-400" />
-            Cài đặt hệ thống
+            {t("settings.systemSettings") || "Cài đặt hệ thống"}
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Cấu hình volume mua, tài khoản xã hội và trọng số GemScore
+            {t("settings.tradingDesc") || "Cấu hình volume mua, tài khoản xã hội và trọng số GemScore"}
           </p>
         </div>
         <button
@@ -411,12 +415,12 @@ export function SettingsPanel() {
           {saving ? (
             <>
               <span className="size-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
-              Đang lưu…
+              {t("common.saving") || "Đang lưu…"}
             </>
           ) : (
             <>
               <Save className="size-4" />
-              Lưu cài đặt
+              {t("common.save") || "Lưu cài đặt"}
             </>
           )}
         </button>
@@ -426,7 +430,7 @@ export function SettingsPanel() {
       {saved && (
         <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
           <CheckCircle2 className="size-4 shrink-0" />
-          Cài đặt đã được lưu thành công!
+          {t("common.savedSuccess") || "Cài đặt đã được lưu thành công!"}
         </div>
       )}
       {error && (
@@ -436,11 +440,51 @@ export function SettingsPanel() {
         </div>
       )}
 
+      {/* ── 0. LANGUAGE SELECTION ──────────────────────────────────────────────── */}
+      <Card className="border-zinc-800/80 bg-zinc-900/50">
+        <CardHeader className="pb-4">
+          <SectionLabel icon={<Globe className="size-4" />}>
+            {t("settings.language") || "Language"}
+          </SectionLabel>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-xs text-zinc-500">
+            {t("settings.languageDesc") || "Select your preferred language"}
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {(
+              [
+                { id: "vi", label: "Tiếng Việt" },
+                { id: "en", label: "English" },
+                { id: "es", label: "Español" },
+                { id: "zh", label: "中文" },
+                { id: "fr", label: "Français" },
+                { id: "ja", label: "日本語" },
+              ] as const
+            ).map((lang) => (
+              <button
+                key={lang.id}
+                type="button"
+                onClick={() => setLanguage(lang.id)}
+                className={`flex items-center justify-between rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
+                  language === lang.id
+                    ? "border-amber-500/50 bg-amber-500/10 text-amber-400"
+                    : "border-zinc-800 bg-zinc-950/50 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800"
+                }`}
+              >
+                {lang.label}
+                {language === lang.id && <CheckCircle2 className="size-4" />}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ── 1. TRADING VOLUME ──────────────────────────────────────────────── */}
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-4">
           <SectionLabel icon={<Zap className="size-4" />}>
-            Volume mua Gems
+            {t("settings.buyVolume")}
           </SectionLabel>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -448,7 +492,7 @@ export function SettingsPanel() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="text-sm font-medium text-zinc-300">
-                SOL mỗi lệnh mua
+                {t("settings.buyVolume")}
               </label>
               <div className="flex items-center gap-2">
                 <span className="rounded-lg bg-amber-500/15 px-3 py-1 text-lg font-bold font-mono text-amber-400">
@@ -503,7 +547,7 @@ export function SettingsPanel() {
 
             <p className="mt-2 flex items-center gap-1.5 text-xs text-zinc-600">
               <Info className="size-3" />
-              Phạm vi cho phép: 0.05 – 1 SOL mỗi lệnh
+              {t("settings.rangeLimit")?.replace("{min}", "0.05").replace("{max}", "1") || "Phạm vi cho phép: 0.05 – 1 SOL mỗi lệnh"}
             </p>
           </div>
 
@@ -513,16 +557,16 @@ export function SettingsPanel() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-zinc-200">
-                Tự động mua khi phát hiện Gem tốt
+                {t("settings.autoBuy")}
               </p>
               <p className="text-xs text-zinc-500 mt-0.5">
-                Tự động đặt lệnh khi GemScore đạt ngưỡng tối thiểu
+                {t("settings.autoBuyDesc")}
               </p>
             </div>
             <Toggle
               checked={settings.autoBuyEnabled}
               onChange={(v) => update({ autoBuyEnabled: v })}
-              label={settings.autoBuyEnabled ? "Đang bật" : "Đang tắt"}
+              label={settings.autoBuyEnabled ? (t("common.on") || "Đang bật") : (t("common.off") || "Đang tắt")}
             />
           </div>
 
@@ -531,7 +575,7 @@ export function SettingsPanel() {
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-zinc-300">
-                  GemScore tối thiểu để trigger
+                  {t("settings.minGemScore")}
                 </label>
                 <span className="rounded-lg bg-amber-500/15 px-2.5 py-1 text-sm font-bold font-mono text-amber-400">
                   {settings.minGemScoreToTrigger}
@@ -552,9 +596,9 @@ export function SettingsPanel() {
                 className="w-full accent-amber-500"
               />
               <div className="flex justify-between text-[10px] text-zinc-600">
-                <span>50 — Rủi ro cao</span>
-                <span>80 — Cân bằng</span>
-                <span>100 — Cực an toàn</span>
+                <span>50 — High risk</span>
+                <span>80 — Balanced</span>
+                <span>100 — Very safe</span>
               </div>
             </div>
           )}
@@ -565,7 +609,7 @@ export function SettingsPanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-4">
           <SectionLabel icon={<TrendingUp className="size-4" />}>
-            Chiến lược bán token
+            {t("settings.takeProfit")}
           </SectionLabel>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -573,16 +617,16 @@ export function SettingsPanel() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-medium text-zinc-200">
-                Tự động bán khi đang giữ token
+                {t("settings.autoSell")}
               </p>
               <p className="text-xs text-zinc-500 mt-0.5">
-                Bot tự khớp lệnh bán theo phương án bên dưới khi giá đạt mục tiêu
+                {t("settings.autoSellDesc")}
               </p>
             </div>
             <Toggle
               checked={sell.enabled}
               onChange={(v) => updateSell({ enabled: v })}
-              label={sell.enabled ? "Đang bật" : "Đang tắt"}
+              label={sell.enabled ? (t("common.on") || "Đang bật") : (t("common.off") || "Đang tắt")}
             />
           </div>
 
@@ -591,15 +635,15 @@ export function SettingsPanel() {
               {/* Mode selector */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-300">
-                  Phương án bán
+                  {t("settings.sellModeMode")}
                 </label>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {(
                     [
-                      { k: "ladder", icon: <Target className="size-3.5" />, label: "Bậc thang" },
-                      { k: "single", icon: <TrendingUp className="size-3.5" />, label: "Chốt 1 mốc" },
+                      { k: "ladder", icon: <Target className="size-3.5" />, label: t("settings.modeLadder") },
+                      { k: "single", icon: <TrendingUp className="size-3.5" />, label: t("settings.modeSingle") },
                       { k: "trailing", icon: <TrendingDown className="size-3.5" />, label: "Trailing stop" },
-                      { k: "manual", icon: <Hand className="size-3.5" />, label: "Thủ công" },
+                      { k: "manual", icon: <Hand className="size-3.5" />, label: t("settings.modeManual") },
                     ] as { k: SellMode; icon: React.ReactNode; label: string }[]
                   ).map((m) => (
                     <button
@@ -618,14 +662,10 @@ export function SettingsPanel() {
                   ))}
                 </div>
                 <p className="mt-2 text-xs text-zinc-600">
-                  {sell.mode === "ladder" &&
-                    "Chia nhỏ vị thế, bán dần theo từng mốc giá nhân (x2, x4…)."}
-                  {sell.mode === "single" &&
-                    "Bán toàn bộ vị thế một lần khi giá đạt mốc nhân mục tiêu."}
-                  {sell.mode === "trailing" &&
-                    "Giữ cho lời chạy, chỉ bán khi giá rớt một tỷ lệ so với đỉnh."}
-                  {sell.mode === "manual" &&
-                    "Bot không tự bán — chỉ áp dụng cắt lỗ / thoát theo thời gian nếu bật."}
+                  {sell.mode === "ladder" && t("settings.modeLadderDesc")}
+                  {sell.mode === "single" && t("settings.modeSingleDesc")}
+                  {sell.mode === "trailing" && t("settings.modeTrailingDesc")}
+                  {sell.mode === "manual" && t("settings.modeManualDesc")}
                 </p>
               </div>
 
@@ -634,7 +674,7 @@ export function SettingsPanel() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium text-zinc-300">
-                      Bậc thang chốt lời
+                      {t("settings.ladderTitle")}
                     </label>
                     <span
                       className={`rounded-lg px-2.5 py-1 text-xs font-bold font-mono ${
@@ -643,14 +683,14 @@ export function SettingsPanel() {
                           : "bg-emerald-500/15 text-emerald-400"
                       }`}
                     >
-                      Đã bán {ladderSellTotal}% · Giữ lại {ladderRemainder}%
+                      {t("settings.sold")} {ladderSellTotal}% · {t("settings.kept")} {ladderRemainder}%
                     </span>
                   </div>
 
                   {ladderSellTotal > 100 && (
                     <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
                       <AlertCircle className="size-3.5 shrink-0" />
-                      Tổng % bán vượt quá 100% — hãy giảm bớt ở các mốc.
+                      {t("settings.ladderWarning")}
                     </div>
                   )}
 
@@ -661,7 +701,7 @@ export function SettingsPanel() {
                         className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5"
                       >
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-zinc-500">Giá</span>
+                          <span className="text-xs text-zinc-500">{t("settings.price")}</span>
                           <input
                             type="number"
                             min={1.1}
@@ -677,7 +717,7 @@ export function SettingsPanel() {
                           <span className="text-sm font-bold text-amber-400">x</span>
                         </div>
                         <div className="flex flex-1 items-center gap-2">
-                          <span className="text-xs text-zinc-500">bán</span>
+                          <span className="text-xs text-zinc-500">{t("settings.sellPercent")}</span>
                           <input
                             type="range"
                             min={1}
@@ -712,13 +752,12 @@ export function SettingsPanel() {
                     className="flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
                   >
                     <Plus className="size-4" />
-                    Thêm mốc chốt lời
+                    {t("settings.addTier")}
                   </button>
 
                   <p className="flex items-start gap-1.5 text-xs text-zinc-600">
                     <Info className="size-3 mt-0.5 shrink-0" />
-                    % tính trên vị thế ban đầu. Phần còn lại ({ladderRemainder}%) được
-                    giữ để bạn tự bán bằng tay.
+                    {t("settings.remainderNote")?.replace("{rem}", ladderRemainder.toString())}
                   </p>
                 </div>
               )}
@@ -729,7 +768,7 @@ export function SettingsPanel() {
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                       <Target className="size-3.5 text-amber-400" />
-                      Mốc chốt toàn bộ
+                      {t("settings.singleTargetTitle")}
                     </label>
                     <span className="rounded-lg bg-amber-500/15 px-2.5 py-1 text-sm font-bold font-mono text-amber-400">
                       x{sell.singleTargetMultiplier}
@@ -749,8 +788,7 @@ export function SettingsPanel() {
                     className="w-full accent-amber-500"
                   />
                   <p className="text-xs text-zinc-600">
-                    Bán 100% vị thế khi giá đạt x{sell.singleTargetMultiplier} so với
-                    giá vào lệnh.
+                    {t("settings.singleTargetDesc")?.replace("{x}", sell.singleTargetMultiplier.toString())}
                   </p>
                 </div>
               )}
@@ -761,7 +799,7 @@ export function SettingsPanel() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium text-zinc-300">
-                        Kích hoạt trailing khi đạt
+                        {t("settings.trailingActivateTitle")}
                       </label>
                       <span className="rounded-lg bg-amber-500/15 px-2.5 py-1 text-sm font-bold font-mono text-amber-400">
                         x{sell.trailingActivateMultiplier}
@@ -784,7 +822,7 @@ export function SettingsPanel() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <label className="text-sm font-medium text-zinc-300">
-                        Bán khi rớt khỏi đỉnh
+                        {t("settings.trailingDropTitle")}
                       </label>
                       <span className="rounded-lg bg-amber-500/15 px-2.5 py-1 text-sm font-bold font-mono text-amber-400">
                         -{sell.trailingStopPercent}%
@@ -805,8 +843,7 @@ export function SettingsPanel() {
                     />
                   </div>
                   <p className="text-xs text-zinc-600">
-                    Sau khi giá đạt x{sell.trailingActivateMultiplier}, bot theo dõi
-                    đỉnh và bán nếu giá giảm {sell.trailingStopPercent}% so với đỉnh.
+                    {t("settings.trailingDesc")?.replace("{x}", sell.trailingActivateMultiplier.toString()).replace("{y}", sell.trailingStopPercent.toString())}
                   </p>
                 </div>
               )}
@@ -818,7 +855,7 @@ export function SettingsPanel() {
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                     <TrendingDown className="size-3.5 text-red-400" />
-                    Cắt lỗ (Stop-loss)
+                    {t("settings.stopLossTitle")}
                   </label>
                   <span
                     className={`rounded-lg px-2.5 py-1 text-sm font-bold font-mono ${
@@ -827,7 +864,7 @@ export function SettingsPanel() {
                         : "bg-zinc-800 text-zinc-500"
                     }`}
                   >
-                    {sell.stopLossPercent > 0 ? `-${sell.stopLossPercent}%` : "Tắt"}
+                    {sell.stopLossPercent > 0 ? `-${sell.stopLossPercent}%` : t("common.off")}
                   </span>
                 </div>
                 <input
@@ -843,8 +880,8 @@ export function SettingsPanel() {
                 />
                 <p className="text-xs text-zinc-600">
                   {sell.stopLossPercent > 0
-                    ? `Bán toàn bộ nếu giá giảm ${sell.stopLossPercent}% dưới giá vào lệnh.`
-                    : "Kéo sang phải để bật cắt lỗ bảo vệ vốn."}
+                    ? t("settings.stopLossOn")?.replace("{x}", sell.stopLossPercent.toString())
+                    : t("settings.stopLossOff")}
                 </p>
               </div>
 
@@ -855,7 +892,7 @@ export function SettingsPanel() {
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                     <Timer className="size-3.5 text-sky-400" />
-                    Thoát theo thời gian
+                    {t("settings.timeExitTitle")}
                   </label>
                   <span
                     className={`rounded-lg px-2.5 py-1 text-sm font-bold font-mono ${
@@ -865,8 +902,8 @@ export function SettingsPanel() {
                     }`}
                   >
                     {sell.maxHoldMinutes > 0
-                      ? `${sell.maxHoldMinutes} phút`
-                      : "Tắt"}
+                      ? `${sell.maxHoldMinutes} m`
+                      : t("common.off")}
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -881,12 +918,12 @@ export function SettingsPanel() {
                           : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
                       }`}
                     >
-                      {m === 0 ? "Tắt" : m < 60 ? `${m}p` : `${m / 60}h`}
+                      {m === 0 ? t("common.off") : m < 60 ? `${m}m` : `${m / 60}h`}
                     </button>
                   ))}
                 </div>
                 <p className="text-xs text-zinc-600">
-                  Bán phần còn lại nếu đã giữ quá thời gian này mà chưa đạt mục tiêu.
+                  {t("settings.timeExitDesc")}
                 </p>
               </div>
 
@@ -897,7 +934,7 @@ export function SettingsPanel() {
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                     <Hand className="size-3.5 text-emerald-400" />
-                    Giữ lại để tự bán
+                    {t("settings.moonBagTitle")}
                   </label>
                   <span className="rounded-lg bg-emerald-500/15 px-2.5 py-1 text-sm font-bold font-mono text-emerald-400">
                     {sell.manualHoldPercent}%
@@ -915,8 +952,7 @@ export function SettingsPanel() {
                   className="w-full accent-emerald-500"
                 />
                 <p className="text-xs text-zinc-600">
-                  Phần vị thế bot không bao giờ tự bán — để bạn chủ động chốt tay
-                  (moon bag).
+                  {t("settings.moonBagDesc")}
                 </p>
               </div>
             </>
@@ -928,20 +964,19 @@ export function SettingsPanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-4">
           <SectionLabel icon={<Send className="size-4" />}>
-            Tài khoản Telegram
+            {t("settings.telegramTitle")}
           </SectionLabel>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-xs text-zinc-500">
-            Thêm tài khoản Telegram để thu thập dữ liệu từ các kênh/group crypto —
-            dùng để tính điểm <strong className="text-zinc-400">GemScore Social</strong>.
+            {t("settings.telegramDesc1")} <strong className="text-zinc-400">GemScore Social</strong>.
           </p>
 
           {/* Account list */}
           <div className="space-y-2">
             {settings.telegramAccounts.length === 0 ? (
               <div className="rounded-xl border border-dashed border-zinc-800 py-6 text-center text-sm text-zinc-600">
-                Chưa có tài khoản nào — thêm ít nhất một tài khoản bên dưới
+                {t("common.noAccounts") || "Chưa có tài khoản nào — thêm ít nhất một tài khoản bên dưới"}
               </div>
             ) : (
               settings.telegramAccounts.map((acc) => (
@@ -961,16 +996,16 @@ export function SettingsPanel() {
           {/* Add form */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 space-y-3">
             <p className="text-xs font-medium text-zinc-400">
-              Thêm tài khoản mới
+              {t("settings.addAccount")}
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-[11px] text-zinc-500">
-                  Username / Số điện thoại *
+                  {t("settings.usernameLabel")}
                 </label>
                 <input
                   type="text"
-                  placeholder="@username hoặc +84..."
+                  placeholder={t("settings.usernamePlaceholder")}
                   value={tgUsername}
                   onChange={(e) => setTgUsername(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addTelegram()}
@@ -979,11 +1014,11 @@ export function SettingsPanel() {
               </div>
               <div>
                 <label className="mb-1 block text-[11px] text-zinc-500">
-                  Nhãn hiển thị
+                  {t("settings.labelLabel")}
                 </label>
                 <input
                   type="text"
-                  placeholder="VD: Bot chính, Tài khoản phụ…"
+                  placeholder={t("settings.labelPlaceholder")}
                   value={tgLabel}
                   onChange={(e) => setTgLabel(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addTelegram()}
@@ -998,7 +1033,7 @@ export function SettingsPanel() {
               className="flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:opacity-40"
             >
               <Plus className="size-4" />
-              Thêm tài khoản Telegram
+              {t("settings.addAccount")}
             </button>
           </div>
         </CardContent>
@@ -1008,20 +1043,19 @@ export function SettingsPanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-4">
           <SectionLabel icon={<Hash className="size-4" />}>
-            Tài khoản X (Twitter)
+            {t("settings.xTitle")}
           </SectionLabel>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-xs text-zinc-500">
-            Thêm tài khoản X để theo dõi sentiment, KOL tweets và trending hashtag
-            — dùng để tính điểm <strong className="text-zinc-400">GemScore Social</strong>.
+            {t("settings.xDesc1")} <strong className="text-zinc-400">GemScore Social</strong>.
           </p>
 
           {/* Account list */}
           <div className="space-y-2">
             {settings.xAccounts.length === 0 ? (
               <div className="rounded-xl border border-dashed border-zinc-800 py-6 text-center text-sm text-zinc-600">
-                Chưa có tài khoản nào — thêm ít nhất một tài khoản bên dưới
+                {t("common.noAccounts") || "Chưa có tài khoản nào — thêm ít nhất một tài khoản bên dưới"}
               </div>
             ) : (
               settings.xAccounts.map((acc) => (
@@ -1041,16 +1075,16 @@ export function SettingsPanel() {
           {/* Add form */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 space-y-3">
             <p className="text-xs font-medium text-zinc-400">
-              Thêm tài khoản mới
+              {t("settings.addAccount")}
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-[11px] text-zinc-500">
-                  Handle X *
+                  {t("settings.usernameLabel")}
                 </label>
                 <input
                   type="text"
-                  placeholder="@handle"
+                  placeholder={t("settings.xUsernamePlaceholder")}
                   value={xHandle}
                   onChange={(e) => setXHandle(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addX()}
@@ -1059,11 +1093,11 @@ export function SettingsPanel() {
               </div>
               <div>
                 <label className="mb-1 block text-[11px] text-zinc-500">
-                  Nhãn hiển thị
+                  {t("settings.labelLabel")}
                 </label>
                 <input
                   type="text"
-                  placeholder="VD: KOL chính, Monitor…"
+                  placeholder={t("settings.xLabelPlaceholder")}
                   value={xLabel}
                   onChange={(e) => setXLabel(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addX()}
@@ -1078,7 +1112,7 @@ export function SettingsPanel() {
               className="flex items-center gap-2 rounded-lg bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:opacity-40"
             >
               <Plus className="size-4" />
-              Thêm tài khoản X
+              {t("settings.addAccount")}
             </button>
           </div>
         </CardContent>
@@ -1088,13 +1122,12 @@ export function SettingsPanel() {
       <Card className="border-zinc-800/80 bg-zinc-900/50">
         <CardHeader className="pb-4">
           <SectionLabel icon={<Sliders className="size-4" />}>
-            Trọng số GemScore Social
+            {t("settings.weightTitle2")}
           </SectionLabel>
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-xs text-zinc-500">
-            Điều chỉnh mức ảnh hưởng của từng nền tảng đến điểm GemScore.
-            Tổng luôn = 100%.
+            {t("settings.weightDesc2")}
           </p>
 
           {/* Telegram weight */}
@@ -1174,19 +1207,12 @@ export function SettingsPanel() {
           <div className="flex gap-3">
             <ShieldCheck className="size-5 shrink-0 text-amber-500/60 mt-0.5" />
             <div className="space-y-1 text-xs text-zinc-500">
-              <p className="font-medium text-zinc-400">Lưu ý quan trọng</p>
+              <p className="font-medium text-zinc-400">{t("settings.importantNoteTitle")}</p>
               <p>
-                Cài đặt được lưu cục bộ trên server. Tính năng tự động mua chỉ
-                hoạt động khi bot Solana trading đã được kết nối và cấu hình
-                ví đúng trong{" "}
-                <code className="rounded bg-zinc-800 px-1 py-0.5 font-mono text-[10px] text-zinc-300">
-                  .env.local
-                </code>
-                .
+                {t("settings.localSaveNote")}
               </p>
               <p>
-                Dữ liệu social từ Telegram và X chỉ dùng để tính điểm GemScore —
-                không được dùng cho mục đích thương mại hay chia sẻ bên thứ ba.
+                {t("settings.socialNote")}
               </p>
             </div>
           </div>
@@ -1204,12 +1230,12 @@ export function SettingsPanel() {
           {saving ? (
             <>
               <span className="size-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
-              Đang lưu…
+              {t("common.saving")}
             </>
           ) : (
             <>
               <Save className="size-4" />
-              Lưu cài đặt
+              {t("common.save")}
             </>
           )}
         </button>

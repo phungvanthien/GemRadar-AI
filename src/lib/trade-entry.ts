@@ -40,6 +40,19 @@ import {
 } from "./position-store";
 import { loadMandate } from "./mandate-store";
 import { computeAccounting, evaluateEntryGate, type Mandate } from "./mandate";
+import { evaluateTokenSafety } from "./token-safety";
+
+// Risk-adjusted sizing (POST-MORTEM P1): a riskier token gets a smaller clip.
+// At rugRisk 0 the mandate's full size is used; it scales down linearly to this
+// floor fraction at the reject threshold. Flat 0.05-SOL sizing across SIP /
+// CATGPT / POKEMON meant the two rugs cost as much as the one winner made.
+const MIN_SIZE_FRACTION = 0.4;
+
+function riskSizeMultiplier(rugRisk: number, maxRugRiskScore: number): number {
+  if (maxRugRiskScore <= 0) return 1;
+  const ratio = Math.max(0, Math.min(1, rugRisk / maxRugRiskScore));
+  return 1 - (1 - MIN_SIZE_FRACTION) * ratio;
+}
 
 // A scored gem as produced by the solana-gems pipeline (gem + breakdown).
 export interface ScoredGem extends SolanaGemAnalysis {
@@ -171,6 +184,22 @@ export async function maybeEnterPositions(
       continue;
     }
 
+    // Token-safety gate (POST-MORTEM P0): reject un-renounced mints, thin
+    // liquidity, concentrated supply, and too-young launches before we size or
+    // buy. rugRisk also feeds dynamic sizing below. Runs on the metrics the gem
+    // pipeline already computed — no extra chain calls.
+    const safety = evaluateTokenSafety(gem.onChain, cfg);
+    if (safety.rejected) {
+      decisions.push({
+        mint: gem.mint,
+        symbol: gem.symbol,
+        action: "skipped",
+        mode,
+        reason: `token-safety: ${safety.flags[0] ?? "rejected"}`,
+      });
+      continue;
+    }
+
     // Mandate entry-gate: sizes the buy from entrusted capital and enforces
     // portfolio-level risk (drawdown, daily loss, max-open, available). Re-run
     // per gem because deployedSol / openCount change as we buy within this scan.
@@ -192,7 +221,9 @@ export async function maybeEnterPositions(
       continue;
     }
 
-    const sol = gate.sizeSol;
+    // Risk-adjusted sizing: scale the mandate's full clip down by rug risk so a
+    // borderline token commits less capital than a clean one.
+    const sol = gate.sizeSol * riskSizeMultiplier(safety.rugRisk, cfg.maxRugRiskScore);
     const priceUsd = gem.price > 0 ? gem.price : 0;
 
     try {

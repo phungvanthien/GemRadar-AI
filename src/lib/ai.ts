@@ -99,7 +99,7 @@ function logUsage(label: string, usage: OpenAI.Completions.CompletionUsage | und
   );
 }
 
-const CHAT_SYSTEM_PROMPT = `You are AlphaHunter AI, an expert crypto market analyst assistant.
+const CHAT_SYSTEM_PROMPT = `You are GemRadar AI, an expert crypto market analyst assistant.
 You help users discover opportunities, analyze token growth potential, compare tokens, and find promising assets on various chains including BNB Chain and Solana.
 Be concise, data-driven, and clearly state risks. Never guarantee returns.
 When comparing tokens, use structured bullet points.
@@ -232,7 +232,15 @@ export async function analyzeGems(tokens: MarketToken[]): Promise<GemAnalysis[]>
 
   if (!raw) return [];
 
-  const parsed = JSON.parse(stripJsonFences(raw)) as {
+  let parsedData;
+  try {
+    parsedData = JSON.parse(stripJsonFences(raw));
+  } catch (err) {
+    console.error("JSON Parse Error in AI analysis:", err);
+    console.error("Raw LLM response was:", raw);
+    throw err;
+  }
+  const parsed = parsedData as {
     gems: {
       symbol: string;
       name: string;
@@ -267,8 +275,12 @@ export async function analyzeGems(tokens: MarketToken[]): Promise<GemAnalysis[]>
 }
 
 function stripJsonFences(text: string): string {
-  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  return fenceMatch ? fenceMatch[1].trim() : text;
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  if (first !== -1 && last !== -1 && last >= first) {
+    return text.substring(first, last + 1);
+  }
+  return text.trim();
 }
 
 const SOLANA_GEM_SYSTEM_PROMPT = `You analyze Solana SPL tokens for hidden gem potential using on-chain safety signals.
@@ -341,7 +353,15 @@ export async function analyzeSolanaGems(
 
   if (!raw) return [];
 
-  const parsed = JSON.parse(stripJsonFences(raw)) as {
+  let parsedData;
+  try {
+    parsedData = JSON.parse(stripJsonFences(raw));
+  } catch (err) {
+    console.error("JSON Parse Error in AI analysis:", err);
+    console.error("Raw LLM response was:", raw);
+    throw err;
+  }
+  const parsed = parsedData as {
     gems: {
       symbol: string;
       name: string;

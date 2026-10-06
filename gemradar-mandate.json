@@ -1,0 +1,12 @@
+{
+  "status": "active",
+  "principalSol": 1,
+  "startedAt": "2026-10-04T16:11:16.991Z",
+  "perTradePctOfPrincipal": 5,
+  "reserveSol": 0.1,
+  "maxOpenPositions": 3,
+  "maxDrawdownPct": 25,
+  "dailyLossLimitPct": 15,
+  "onDrawdownBreach": "halt-and-liquidate",
+  "updatedAt": "2026-10-04T16:11:16.992Z"
+}

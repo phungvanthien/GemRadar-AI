@@ -1,12 +1,12 @@
 // Plain settings persistence — no Next.js dependency, so server-side trade
 // modules and the standalone trade-worker can read/write the same
-// alphahunter-settings.json the API route serves. The route imports its types
+// gemradar-settings.json the API route serves. The route imports its types
 // and loader from here; the HTTP layer stays in the route.
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 
-const SETTINGS_PATH = path.join(process.cwd(), "alphahunter-settings.json");
+const SETTINGS_PATH = path.join(process.cwd(), "gemradar-settings.json");
 
 export interface TradingSettings {
   buyVolumeSol: number;
@@ -60,22 +60,27 @@ export const DEFAULT_SETTINGS: TradingSettings = {
   telegramAccounts: [],
   xAccounts: [],
   socialWeights: { telegram: 50, x: 50 },
+  // POST-MORTEM tuning. Two changes from the first live run:
+  //  - stopLossPercent was 0 (DISABLED), so SIP sold at -99.5% with no floor.
+  //    A real stop-loss, paired with the 20s exit loop, caps the downside.
+  //  - the ladder opened at 2x and sold 50%, cutting POKEMON's run off right as
+  //    it was the one winner the gem thesis depends on. First tier is now 3x
+  //    with a smaller clip and a larger moon bag so the 10x tail can run.
   sellStrategy: {
     enabled: true,
     mode: "ladder",
     tiers: [
-      { id: "t2", multiplier: 2, sellPercent: 50 },
-      { id: "t4", multiplier: 4, sellPercent: 10 },
-      { id: "t6", multiplier: 6, sellPercent: 10 },
+      { id: "t3", multiplier: 3, sellPercent: 35 },
+      { id: "t5", multiplier: 5, sellPercent: 15 },
       { id: "t8", multiplier: 8, sellPercent: 10 },
       { id: "t10", multiplier: 10, sellPercent: 10 },
     ],
     singleTargetMultiplier: 3,
     trailingStopPercent: 20,
     trailingActivateMultiplier: 2,
-    stopLossPercent: 0,
+    stopLossPercent: 35,
     maxHoldMinutes: 0,
-    manualHoldPercent: 10,
+    manualHoldPercent: 20,
   },
   updatedAt: new Date().toISOString(),
 };

@@ -4,14 +4,14 @@
 // standalone trade-worker and the API route share one source of truth.
 //
 // This holds ONLY the mandate configuration/state — never the wallet secret
-// (that stays in env, read by trade-wallet.ts). Add alphahunter-mandate.json to
+// (that stays in env, read by trade-wallet.ts). Add gemradar-mandate.json to
 // .gitignore: it is runtime state, like positions/settings.
 
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import { DEFAULT_MANDATE, type Mandate, type MandateStatus } from "./mandate";
 
-const STORE_PATH = path.join(process.cwd(), "alphahunter-mandate.json");
+const STORE_PATH = path.join(process.cwd(), "gemradar-mandate.json");
 
 // Coerce a partial/untrusted on-disk record into a valid Mandate, clamping every
 // numeric field to a sane range. A corrupt or missing file yields DEFAULT_MANDATE.

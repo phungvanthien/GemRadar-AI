@@ -11,7 +11,7 @@
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 
-const STORE_PATH = path.join(process.cwd(), "alphahunter-gem-outcomes.json");
+const STORE_PATH = path.join(process.cwd(), "gemradar-gem-outcomes.json");
 
 // How the token performed by the time the reconcile job classified it. "pending"
 // until the first horizon (1h) has data; terminal buckets are set at the 24h mark.

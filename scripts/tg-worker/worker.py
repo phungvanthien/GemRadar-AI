@@ -194,16 +194,87 @@ def parse_telegram_link(link: str):
 # Telegram scoring  (exactly the original logic)
 # ═════════════════════════════════════════════════════════════════════════════
 
+# Base58 Solana contract address (same shape as the TS CONTRACT_RE in
+# spam-filter.ts). Used to tally the share of messages that dump a contract.
+_CONTRACT_RE = re.compile(r"\b[1-9A-HJ-NP-Za-km-z]{32,44}\b")
+
+
+def _group_spam_signals(msgs: list) -> dict:
+    """Tally aggregate bot-inflation signals over a message sample.
+
+    Mirrors computeGroupSignals() in src/lib/spam-filter.ts so the Python
+    worker and the TypeScript filter agree on the shares they produce. Returns
+    0-1 ratios (not percentages) and the raw unique-sender ratio; all are None
+    when the sample is empty.
+
+      forwardedShare    share of messages that were forwarded
+      anonymousShare    share from anonymous / channel-signed senders
+      contractShare     share containing a Solana contract address
+      uniqueSenderRatio unique senders / total messages (low → bot cluster)
+    """
+    n = len(msgs)
+    if n == 0:
+        return {
+            "forwardedShare":    None,
+            "anonymousShare":    None,
+            "contractShare":     None,
+            "uniqueSenderRatio": None,
+        }
+
+    fwd = anon = contract = 0
+    senders: set = set()
+
+    for m in msgs:
+        if getattr(m, "fwd_from", None) is not None:
+            fwd += 1
+
+        # Anonymous: posted on behalf of the channel (sender_id is None) or by a
+        # hidden admin. Telethon exposes from_id=None for anonymous admins.
+        sender_id = getattr(m, "sender_id", None)
+        if sender_id is None:
+            anon += 1
+        else:
+            senders.add(sender_id)
+
+        text = getattr(m, "message", None) or getattr(m, "raw_text", None) or ""
+        if _CONTRACT_RE.search(text):
+            contract += 1
+
+    return {
+        "forwardedShare":    round(fwd / n, 2),
+        "anonymousShare":    round(anon / n, 2),
+        "contractShare":     round(contract / n, 2),
+        # Unique senders over total messages. Anonymous msgs have no sender id,
+        # so they don't inflate the unique count — matching the TS behaviour.
+        "uniqueSenderRatio": round(len(senders) / n, 2),
+    }
+
+
 def measure_channel(client, entity) -> dict:
-    """Read-only metadata: member count, msg/hour, group age (days)."""
+    """Read-only metadata + bot-inflation signals.
+
+    Returns member count, msg/hour, group age (days), online count, and the
+    aggregate spam signals (forwarded/anonymous/contract share, unique-sender
+    ratio) that src/lib/spam-filter.ts → filterTelegramGroup consumes.
+    """
     members = None
+    online = None
     try:
         full = client(GetFullChannelRequest(entity))
         members = getattr(full.full_chat, "participants_count", None)
+        # online_count isn't on every chat type; degrade to None when absent.
+        online = getattr(full.full_chat, "online_count", None)
     except Exception:
         members = None
+        online = None
 
     msg_per_hour = None
+    spam = {
+        "forwardedShare":    None,
+        "anonymousShare":    None,
+        "contractShare":     None,
+        "uniqueSenderRatio": None,
+    }
     try:
         msgs = list(client.iter_messages(entity, limit=HISTORY_SAMPLE))
         stamped = [m.date for m in msgs if m.date is not None]
@@ -211,6 +282,7 @@ def measure_channel(client, entity) -> dict:
             newest, oldest = stamped[0], stamped[-1]
             span_hours = max((newest - oldest).total_seconds() / 3600.0, 1e-6)
             msg_per_hour = len(stamped) / span_hours
+        spam = _group_spam_signals(msgs)
     except Exception:
         msg_per_hour = None
 
@@ -222,9 +294,14 @@ def measure_channel(client, entity) -> dict:
         )
 
     return {
-        "members":      members,
-        "msgPerHour":   round(msg_per_hour, 2)    if msg_per_hour    is not None else None,
-        "groupAgeDays": round(group_age_days, 1)  if group_age_days  is not None else None,
+        "members":           members,
+        "onlineCount":       online,
+        "msgPerHour":        round(msg_per_hour, 2)    if msg_per_hour    is not None else None,
+        "groupAgeDays":      round(group_age_days, 1)  if group_age_days  is not None else None,
+        "forwardedShare":    spam["forwardedShare"],
+        "anonymousShare":    spam["anonymousShare"],
+        "contractShare":     spam["contractShare"],
+        "uniqueSenderRatio": spam["uniqueSenderRatio"],
     }
 
 

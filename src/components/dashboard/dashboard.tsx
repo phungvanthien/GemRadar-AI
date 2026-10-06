@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Header } from "@/components/dashboard/header";
 import { LeftSidebar } from "@/components/dashboard/left-sidebar";
 import { RightSidebar } from "@/components/dashboard/right-sidebar";
-import { LiveFeed } from "@/components/dashboard/live-feed";
 import { ChatPanel } from "@/components/dashboard/chat-panel";
 import type { MarketOverview } from "@/lib/types";
 
@@ -46,9 +45,6 @@ export function Dashboard() {
         </div>
         <div className="w-full border-t border-zinc-800/80 lg:w-80 lg:shrink-0 lg:border-t-0 lg:border-l">
           <RightSidebar trending={market?.trending ?? []} loading={loading} />
-        </div>
-        <div className="w-full border-t border-zinc-800/80 lg:w-80 lg:shrink-0 lg:border-t-0 lg:border-l">
-          <LiveFeed />
         </div>
       </div>
     </div>

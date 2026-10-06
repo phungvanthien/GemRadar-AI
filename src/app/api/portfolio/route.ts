@@ -4,6 +4,8 @@ import {
   getAllPositions,
   clearAllPositions,
   computeUnrealizedPnlSol,
+  getOpenPositions,
+  writeOffPosition,
   type Position,
   type Fill,
 } from "@/lib/position-store";
@@ -13,10 +15,12 @@ import {
   getBalanceSol,
 } from "@/lib/trade-wallet";
 import { getJupiterPrices } from "@/lib/jupiter";
-import { getTradeConfig } from "@/lib/trade-config";
+import { loadSettings } from "@/lib/settings-store";
+import { getTradeConfig, effectiveMode } from "@/lib/trade-config";
 import { loadMandate } from "@/lib/mandate-store";
 import { computeAccounting } from "@/lib/mandate";
 import { getRealizedPnlToday } from "@/lib/position-store";
+import { readLiveScanState } from "@/lib/live-scan-store";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -51,6 +55,12 @@ interface GemSummary {
   closedReason: string | null;
   entryPriceUsd: number;
   entrySol: number;
+  // Price per token denominated in SOL, for the SOL-rate view. entryPriceSol is
+  // exact (SOL spent / tokens received at entry, no SOL/USD conversion needed).
+  // currentPriceSol derives from the current USD price and the live SOL/USD rate;
+  // null when either is unavailable. Open positions only — null for closed.
+  entryPriceSol: number | null;
+  currentPriceSol: number | null;
   soldPct: number;
   realizedPnlSol: number;
   unrealizedPnlSol: number; // 0 for closed positions
@@ -113,6 +123,17 @@ export async function GET() {
         pos.status === "open"
           ? computeUnrealizedPnlSol(pos, currentPriceUsd)
           : 0;
+      // SOL-rate view (open positions only). entryPriceSol is the exact token/SOL
+      // rate paid at entry; currentPriceSol converts the live USD price via the
+      // current SOL/USD rate so the two can be compared like-for-like.
+      const entryPriceSol =
+        pos.status === "open" && pos.tokenAmount > 0
+          ? pos.entrySol / pos.tokenAmount
+          : null;
+      const currentPriceSol =
+        pos.status === "open" && solPriceUsd != null && solPriceUsd > 0
+          ? currentPriceUsd / solPriceUsd
+          : null;
       return {
         id: pos.id,
         mint: pos.mint,
@@ -124,6 +145,8 @@ export async function GET() {
         closedReason: pos.closedReason ?? null,
         entryPriceUsd: pos.entryPriceUsd,
         entrySol: pos.entrySol,
+        entryPriceSol,
+        currentPriceSol,
         soldPct: pos.soldPct,
         realizedPnlSol: pos.realizedPnlSol,
         unrealizedPnlSol,
@@ -190,8 +213,13 @@ export async function GET() {
       maxSolPerTrade: cfg.maxSolPerTrade,
     });
     const realizedTodaySol = await getRealizedPnlToday();
+    const settings = loadSettings();
+    const liveScan = await readLiveScanState();
+    const isWorkerActive = (Date.now() - new Date(liveScan.updatedAt).getTime()) < 3 * 60_000;
 
     return NextResponse.json({
+      effectiveMode: effectiveMode({ autoBuyEnabled: settings.autoBuyEnabled }),
+      isWorkerActive,
       solPriceUsd,
       wallet: {
         address: walletAddress,
@@ -233,6 +261,64 @@ export async function GET() {
   }
 }
 
+// POST ?action=abandon — manual write-off of a single open position that can no
+// longer be sold (rugpull). Operator-triggered twin of the exit monitor's
+// automatic rugpull write-off: it books the unsold remainder as a realized loss
+// and closes the position so its slot + deployed capital are freed immediately,
+// without waiting for the monitor to accrue three failed sells.
+//
+// Body: { positionId: string }. We do NOT attempt a recovery sell here — the
+// button exists precisely for tokens the operator has confirmed are dead; the
+// exit monitor already tries (and keeps trying) to sell sellable positions.
+export async function POST(req: Request) {
+  try {
+    const url = new URL(req.url);
+    const action = url.searchParams.get("action");
+    if (action !== "abandon") {
+      return NextResponse.json({ error: "Invalid action." }, { status: 400 });
+    }
+
+    const body = (await req.json().catch(() => ({}))) as { positionId?: string };
+    const positionId = body.positionId;
+    if (!positionId) {
+      return NextResponse.json({ error: "Missing positionId." }, { status: 400 });
+    }
+
+    const open = await getOpenPositions();
+    const pos = open.find((p) => p.id === positionId);
+    if (!pos) {
+      return NextResponse.json(
+        { error: "Open position not found." },
+        { status: 404 },
+      );
+    }
+
+    const off = await writeOffPosition(positionId, "manual-writeoff");
+    if (!off) {
+      return NextResponse.json(
+        { error: "Position already closed or cannot be written off." },
+        { status: 409 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      position: {
+        id: off.id,
+        symbol: off.symbol,
+        status: off.status,
+        closedReason: off.closedReason ?? null,
+        realizedPnlSol: off.realizedPnlSol,
+      },
+    });
+  } catch (error) {
+    console.error("[/api/portfolio POST abandon]", error);
+    const message =
+      error instanceof Error ? error.message : "Failed to write off position";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
 // DELETE — wipe the position ledger ("Reset mô phỏng" on the dashboard). Guarded:
 // if the bot is configured for LIVE trading with a real wallet, the ledger holds
 // real-money history, so we refuse. In dry-run (the sim default) it clears freely.
@@ -244,7 +330,7 @@ export async function DELETE() {
       return NextResponse.json(
         {
           error:
-            "Không thể reset khi đang chạy LIVE với ví thật — lịch sử giao dịch thật được bảo vệ.",
+            "Cannot reset when running LIVE with a real wallet — real trading history is protected.",
         },
         { status: 403 },
       );

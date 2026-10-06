@@ -10,6 +10,16 @@
 //  - Layered: multiple weak signals combine into a verdict, no single signal
 //    hard-blocks. This avoids false positives on new-but-legitimate accounts.
 //  - Transparent: every deduction is recorded in `flags` for the UI + AI.
+//  - Configurable: thresholds come from social-monitor.config.json via
+//    social-config.ts. Each public function takes an optional config override so
+//    it stays pure/testable; omitting it loads the on-disk config (server-side).
+
+import {
+  getSocialMonitorConfig,
+  type SpamFilterConfig,
+  type SpamFilterTelegramConfig,
+  type SpamFilterXConfig,
+} from "./social-config";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
@@ -18,14 +28,18 @@
 export interface SpamVerdict {
   /** 0 = definitely spam/bot, 100 = clean signal. Used to discount social scores. */
   authenticityScore: number;
-  /** True when the verdict is confident enough to filter out entirely (score < BOT_THRESHOLD). */
+  /** True when the verdict is confident enough to filter out entirely (score < botThreshold). */
   isSpam: boolean;
   /** Human-readable flags explaining each deduction. Shown in the UI / AI context. */
   flags: string[];
 }
 
-// Score below this → the content/account is treated as spam and excluded.
-const BOT_THRESHOLD = 30;
+// Resolve the spam-filter config: use the caller's override, else load it from
+// social-monitor.config.json. Loading is cached in social-config.ts, so this is
+// cheap to call per message/account.
+function resolveConfig(override?: SpamFilterConfig): SpamFilterConfig {
+  return override ?? getSocialMonitorConfig().spamFilter;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Text-level spam patterns (shared by X + Telegram)
@@ -144,16 +158,21 @@ export interface XAccountSignals {
  *  - Bio spam signals         → up to -20
  *  - Tweet frequency > 100/day → -15 (bot posting rate)
  */
-export function filterXAccount(signals: XAccountSignals): SpamVerdict {
+export function filterXAccount(
+  signals: XAccountSignals,
+  config?: SpamFilterConfig,
+): SpamVerdict {
+  const cfg = resolveConfig(config);
+  const x: SpamFilterXConfig = cfg.x;
   const flags: string[] = [];
   let penalty = 0;
 
   // 1. Account age
   if (signals.accountAgeDays !== null) {
-    if (signals.accountAgeDays < 7) {
+    if (signals.accountAgeDays < x.newAccountDaysHard) {
       flags.push(`account only ${Math.round(signals.accountAgeDays)}d old`);
       penalty += 30;
-    } else if (signals.accountAgeDays < 30) {
+    } else if (signals.accountAgeDays < x.newAccountDaysSoft) {
       flags.push(`account ${Math.round(signals.accountAgeDays)}d old`);
       penalty += 15;
     }
@@ -164,10 +183,10 @@ export function filterXAccount(signals: XAccountSignals): SpamVerdict {
     const ffRatio = signals.followers > 0
       ? signals.following / signals.followers
       : signals.following > 0 ? Infinity : 0;
-    if (ffRatio > 20) {
+    if (ffRatio > x.maxFollowingFollowerRatio) {
       flags.push(`following/follower ratio ${ffRatio.toFixed(1)}x`);
       penalty += 20;
-    } else if (ffRatio > 5) {
+    } else if (ffRatio > x.maxFollowingFollowerRatio / 4) {
       flags.push(`high follow ratio ${ffRatio.toFixed(1)}x`);
       penalty += 10;
     }
@@ -175,7 +194,7 @@ export function filterXAccount(signals: XAccountSignals): SpamVerdict {
 
   // 3. Engagement signals
   if (signals.avgEngagementPerTweet !== null) {
-    if (signals.avgEngagementPerTweet < 0.5 && (signals.tweetCount ?? 0) >= 10) {
+    if (signals.avgEngagementPerTweet < x.minAvgEngagementForActive && (signals.tweetCount ?? 0) >= 10) {
       flags.push("near-zero engagement (ghost/bot)");
       penalty += 25;
     }
@@ -192,10 +211,10 @@ export function filterXAccount(signals: XAccountSignals): SpamVerdict {
   // 4. Tweet frequency (tweets per day since account creation)
   if (signals.tweetCount !== null && signals.accountAgeDays !== null && signals.accountAgeDays > 0) {
     const tweetsPerDay = signals.tweetCount / signals.accountAgeDays;
-    if (tweetsPerDay > 100) {
+    if (tweetsPerDay > x.maxTweetsPerDay) {
       flags.push(`${Math.round(tweetsPerDay)} tweets/day (bot rate)`);
       penalty += 15;
-    } else if (tweetsPerDay > 50) {
+    } else if (tweetsPerDay > x.maxTweetsPerDay / 2) {
       flags.push(`${Math.round(tweetsPerDay)} tweets/day (high)`);
       penalty += 7;
     }
@@ -234,7 +253,7 @@ export function filterXAccount(signals: XAccountSignals): SpamVerdict {
   const authenticityScore = Math.max(0, Math.min(100, 100 - penalty));
   return {
     authenticityScore,
-    isSpam: authenticityScore < BOT_THRESHOLD,
+    isSpam: authenticityScore < cfg.botThreshold,
     flags,
   };
 }
@@ -244,12 +263,13 @@ export function filterXAccount(signals: XAccountSignals): SpamVerdict {
  * Returns a SpamVerdict for the content (not the account).
  * Combine with filterXAccount for a full picture.
  */
-export function filterXTweet(text: string): SpamVerdict {
+export function filterXTweet(text: string, config?: SpamFilterConfig): SpamVerdict {
+  const cfg = resolveConfig(config);
   const { penalty, flags } = scoreText(text);
   const authenticityScore = Math.max(0, Math.min(100, 100 - penalty));
   return {
     authenticityScore,
-    isSpam: authenticityScore < BOT_THRESHOLD,
+    isSpam: authenticityScore < cfg.botThreshold,
     flags,
   };
 }
@@ -262,11 +282,13 @@ export function filterXTweet(text: string): SpamVerdict {
 export function filterXSignal(
   account: XAccountSignals,
   tweetText?: string,
+  config?: SpamFilterConfig,
 ): SpamVerdict {
-  const accountVerdict = filterXAccount(account);
+  const cfg = resolveConfig(config);
+  const accountVerdict = filterXAccount(account, cfg);
   if (!tweetText) return accountVerdict;
 
-  const tweetVerdict = filterXTweet(tweetText);
+  const tweetVerdict = filterXTweet(tweetText, cfg);
   // Take the lower (worse) authenticity score.
   if (tweetVerdict.authenticityScore < accountVerdict.authenticityScore) {
     return {
@@ -278,6 +300,75 @@ export function filterXSignal(
   return {
     ...accountVerdict,
     flags: [...accountVerdict.flags, ...(tweetVerdict.flags.length > 0 ? tweetVerdict.flags.map((f) => `tweet: ${f}`) : [])],
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// X (Twitter) buzz-level bot detection — for the Nitter RSS path
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface XBuzzSignals {
+  /** Tweets seen in the $SYMBOL search sample. */
+  tweetCount: number;
+  /** Distinct authors across those tweets. */
+  uniqueAuthors: number;
+  /** Average engagement (likes + retweets) per tweet in the sample. */
+  avgEngagement: number;
+  /** Tweets within the recency window (< 24h). */
+  recentTweets: number;
+}
+
+/**
+ * Evaluate $SYMBOL buzz from a Nitter RSS search for bot-inflation.
+ *
+ * The Nitter search path produces AGGREGATE buzz across many authors, not a
+ * single profile, so filterXAccount (which needs account age / follower ratios)
+ * doesn't apply. This checks the signals we actually have:
+ *   - Sock-puppet ratio: many tweets from very few authors → coordinated shill.
+ *   - Dead buzz: non-trivial tweet volume with zero engagement → bot farm.
+ *   - Stale buzz: no recent tweets in a large sample → recycled/old chatter.
+ *
+ * Returns a SpamVerdict whose authenticityScore discounts the raw xScore the
+ * same way filterXAccount does for the official-API path.
+ */
+export function filterXBuzz(
+  buzz: XBuzzSignals,
+  config?: SpamFilterConfig,
+): SpamVerdict {
+  const cfg = resolveConfig(config);
+  const flags: string[] = [];
+  let penalty = 0;
+
+  // 1. Sock-puppet ratio: with ≥10 tweets, few distinct authors is coordinated.
+  //    Mirrors the worker's X_PUPPET_RATIO (0.30) cap but as a graded penalty.
+  if (buzz.tweetCount >= 10 && buzz.uniqueAuthors > 0) {
+    const authorRatio = buzz.uniqueAuthors / buzz.tweetCount;
+    if (authorRatio < 0.15) {
+      flags.push(`sock-puppet: ${buzz.uniqueAuthors}/${buzz.tweetCount} authors`);
+      penalty += 40;
+    } else if (authorRatio < 0.3) {
+      flags.push(`low author diversity: ${buzz.uniqueAuthors}/${buzz.tweetCount}`);
+      penalty += 20;
+    }
+  }
+
+  // 2. Dead buzz: real tweet volume but ~zero engagement → bot/zombie activity.
+  if (buzz.tweetCount >= 10 && buzz.avgEngagement < cfg.x.minAvgEngagementForActive) {
+    flags.push("near-zero engagement (bot buzz)");
+    penalty += 25;
+  }
+
+  // 3. Stale buzz: a non-trivial sample with no fresh tweets → recycled chatter.
+  if (buzz.tweetCount >= 10 && buzz.recentTweets === 0) {
+    flags.push("no tweets in last 24h (stale)");
+    penalty += 15;
+  }
+
+  const authenticityScore = Math.max(0, Math.min(100, 100 - penalty));
+  return {
+    authenticityScore,
+    isSpam: authenticityScore < cfg.botThreshold,
+    flags,
   };
 }
 
@@ -322,7 +413,11 @@ export interface TelegramGroupSignals {
 /**
  * Evaluate a single Telegram message for spam/bot signals.
  */
-export function filterTelegramMessage(msg: TelegramMessageSignals): SpamVerdict {
+export function filterTelegramMessage(
+  msg: TelegramMessageSignals,
+  config?: SpamFilterConfig,
+): SpamVerdict {
+  const cfg = resolveConfig(config);
   const flags: string[] = [];
   let penalty = 0;
 
@@ -365,7 +460,7 @@ export function filterTelegramMessage(msg: TelegramMessageSignals): SpamVerdict 
   const authenticityScore = Math.max(0, Math.min(100, 100 - penalty));
   return {
     authenticityScore,
-    isSpam: authenticityScore < BOT_THRESHOLD,
+    isSpam: authenticityScore < cfg.botThreshold,
     flags,
   };
 }
@@ -379,18 +474,29 @@ export function filterTelegramMessage(msg: TelegramMessageSignals): SpamVerdict 
  *   0.0 = group looks entirely bot-inflated, socialScore zeroed out
  *
  * Also returns a SpamVerdict for logging/UI.
+ *
+ * Config note: the telegram.* share thresholds are stored as PERCENTAGES
+ * (e.g. maxForwardedSharePct: 40) while the signals are 0-1 ratios, so each is
+ * divided by 100 before comparing. minOnlineRatioPct is also a percent.
  */
-export function filterTelegramGroup(group: TelegramGroupSignals): SpamVerdict & { scoreMultiplier: number } {
+export function filterTelegramGroup(
+  group: TelegramGroupSignals,
+  config?: SpamFilterConfig,
+): SpamVerdict & { scoreMultiplier: number } {
+  const cfg = resolveConfig(config);
+  const tg: SpamFilterTelegramConfig = cfg.telegram;
   const flags: string[] = [];
   let penalty = 0;
 
-  // 1. Member/online ratio: if online << 1% of members, group is ghost/bought.
+  // 1. Member/online ratio: if online is far below the configured floor, the
+  //    group is ghost/bought. minOnlineRatioPct is a percent (e.g. 0.5 = 0.5%).
   if (group.memberCount !== null && group.onlineCount != null && group.memberCount > 500) {
     const onlineRatio = group.onlineCount / group.memberCount;
-    if (onlineRatio < 0.005) {
+    const floor = tg.minOnlineRatioPct / 100;
+    if (onlineRatio < floor / 2) {
       flags.push(`ghost group: ${(onlineRatio * 100).toFixed(2)}% online`);
       penalty += 25;
-    } else if (onlineRatio < 0.01) {
+    } else if (onlineRatio < floor) {
       flags.push(`low engagement: ${(onlineRatio * 100).toFixed(2)}% online`);
       penalty += 12;
     }
@@ -399,8 +505,8 @@ export function filterTelegramGroup(group: TelegramGroupSignals): SpamVerdict & 
   // 2. Message rate vs members: suspicious spikes
   if (group.msgPerHour !== null && group.memberCount !== null && group.memberCount > 0) {
     const msgRate = group.msgPerHour / group.memberCount;
-    if (msgRate > 1) {
-      // More than 1 msg/hour/member → likely bot posting
+    if (msgRate > tg.maxMsgRatePerMemberPerHour) {
+      // More than the configured msg/hour/member → likely bot posting
       flags.push(`high msg rate ${msgRate.toFixed(2)} msg/hr/member`);
       penalty += 20;
     }
@@ -416,28 +522,30 @@ export function filterTelegramGroup(group: TelegramGroupSignals): SpamVerdict & 
   }
 
   // 4. High forwarded message share
-  if (typeof group.forwardedShare === "number" && group.forwardedShare > 0.4) {
+  if (typeof group.forwardedShare === "number" && group.forwardedShare > tg.maxForwardedSharePct / 100) {
     flags.push(`${Math.round(group.forwardedShare * 100)}% forwarded msgs`);
     penalty += 15;
   }
 
   // 5. High anonymous sender share
-  if (typeof group.anonymousShare === "number" && group.anonymousShare > 0.3) {
+  if (typeof group.anonymousShare === "number" && group.anonymousShare > tg.maxAnonymousSharePct / 100) {
     flags.push(`${Math.round(group.anonymousShare * 100)}% anonymous msgs`);
     penalty += 12;
   }
 
   // 6. High contract address share (contract dump channels)
-  if (typeof group.contractShare === "number" && group.contractShare > 0.5) {
+  if (typeof group.contractShare === "number" && group.contractShare > tg.maxContractSharePct / 100) {
     flags.push(`${Math.round(group.contractShare * 100)}% msgs with contract`);
     penalty += 18;
   }
 
-  // 7. Low unique sender ratio (few senders sending many messages → bot cluster)
-  if (typeof group.uniqueSenderRatio === "number" && group.uniqueSenderRatio < 0.05) {
+  // 7. Low unique sender ratio (few senders sending many messages → bot cluster).
+  //    minUniqueSenderRatioPct is a percent (e.g. 5 = 5%).
+  const uniqueFloor = tg.minUniqueSenderRatioPct / 100;
+  if (typeof group.uniqueSenderRatio === "number" && group.uniqueSenderRatio < uniqueFloor) {
     flags.push(`low unique senders ${(group.uniqueSenderRatio * 100).toFixed(1)}%`);
     penalty += 20;
-  } else if (typeof group.uniqueSenderRatio === "number" && group.uniqueSenderRatio < 0.15) {
+  } else if (typeof group.uniqueSenderRatio === "number" && group.uniqueSenderRatio < uniqueFloor * 3) {
     flags.push(`concentrated senders ${(group.uniqueSenderRatio * 100).toFixed(1)}%`);
     penalty += 10;
   }
@@ -448,7 +556,7 @@ export function filterTelegramGroup(group: TelegramGroupSignals): SpamVerdict & 
 
   return {
     authenticityScore,
-    isSpam: authenticityScore < BOT_THRESHOLD,
+    isSpam: authenticityScore < cfg.botThreshold,
     flags,
     scoreMultiplier,
   };

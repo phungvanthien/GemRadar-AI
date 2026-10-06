@@ -23,8 +23,12 @@ export interface RecentMint {
 
 const CAPACITY = 200;
 
-// newest-first. A small array is fine at this capacity; we dedupe on record.
-const buffer: RecentMint[] = [];
+// Next.js dev mode isolation fix: use globalThis to share state between routes
+const globalAny = globalThis as any;
+if (!globalAny.__recentMintsBuffer) {
+  globalAny.__recentMintsBuffer = [];
+}
+const buffer: RecentMint[] = globalAny.__recentMintsBuffer;
 
 export function recordMint(entry: Omit<RecentMint, "seenAt">): void {
   const seenAt = Date.now();

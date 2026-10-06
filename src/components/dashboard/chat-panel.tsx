@@ -99,7 +99,7 @@ export function ChatPanel() {
     {
       role: "assistant",
       content:
-        "Welcome to AlphaHunter AI. Hit **Find Hidden Gems** to scan the freshest Solana mints from the live RugCheck feed — each is scored on security, liquidity, and holder distribution, then explained by AI. Ask me anything about reading those signals.",
+        "Welcome to GemRadar AI. Hit **Find Hidden Gems** to scan the freshest Solana mints from the live RugCheck feed — each is scored on security, liquidity, and holder distribution, then explained by AI. Ask me anything about reading those signals.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -359,7 +359,7 @@ export function ChatPanel() {
               !messages[messages.length - 1]?.content && (
                 <div className="flex items-center gap-2 text-sm text-zinc-500">
                   <Loader2 className="size-4 animate-spin" />
-                  {toolStatus ?? "AlphaHunter is analyzing..."}
+                  {toolStatus ?? "GemRadar is analyzing..."}
                 </div>
               )}
             <div ref={bottomRef} />

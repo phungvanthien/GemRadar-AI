@@ -1,0 +1,1493 @@
+{
+  "items": [
+    {
+      "mint": "C2MvcWD86peRanQAnJfiDPurs7e7CkMsnP1bHBNJvBpA",
+      "symbol": "MOTH",
+      "name": "MOTH",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 72,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 72,
+      "peakScoreTotal": 72,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 5,
+      "lastSkipReason": "total 72 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 61.136324175628616,
+          "covered": true,
+          "notes": [
+            "LP $11,818",
+            "volume 24h N/A"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 25,
+          "covered": true,
+          "notes": [
+            "top10 89% (very concentrated)",
+            "largest holder 41%",
+            "2,382 holders"
+          ]
+        },
+        "total": 72,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "3K1U9rwWVFhSXoVJqJfLoujKpkn85Cve3T8mZuq4pump",
+      "symbol": "NEWS",
+      "name": "Make News Fun",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 72,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 72,
+      "peakScoreTotal": 72,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 4,
+      "lastSkipReason": "total 72 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.00008077765822962215,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 69.39797154359601,
+          "covered": true,
+          "notes": [
+            "LP $24,539",
+            "vol24h $81,550",
+            "turnover 1.05×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 35.98982188295165,
+          "covered": true,
+          "notes": [
+            "47% buys",
+            "4 insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 45.75461156000491,
+          "covered": true,
+          "notes": [
+            "top10 36%",
+            "largest holder 17%",
+            "210 holders"
+          ]
+        },
+        "total": 72,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "4xUwewcRJa2k83MRgUepKgvKDRAASry65FZ37PK9pump",
+      "symbol": "LORENZO",
+      "name": "OFFICIAL LORENZO SEWELL",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 67,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 67,
+      "peakScoreTotal": 67,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 67 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000008904726577618476,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 41.44798153603333,
+          "covered": true,
+          "notes": [
+            "LP $5,826",
+            "volume 24h N/A"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 25,
+          "covered": true,
+          "notes": [
+            "top10 89% (very concentrated)",
+            "largest holder 65%",
+            "2,024 holders"
+          ]
+        },
+        "total": 67,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "TcnKFgDZc6RhAz83JHHbWeZ5wLc2at8iHK6FhsxkTLh",
+      "symbol": "Lucia",
+      "name": "Lucia",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 65,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 65,
+      "peakScoreTotal": 65,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": 6,
+      "aiRiskScore": 7,
+      "lastSkipReason": "total 65 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000026887769753617267,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 44.722765518859276,
+          "covered": true,
+          "notes": [
+            "LP $15,950",
+            "vol24h $155",
+            "turnover 0.01×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 67.29411764705883,
+          "covered": true,
+          "notes": [
+            "59% buys",
+            "1 insider network"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 28.331506672925183,
+          "covered": true,
+          "notes": [
+            "top10 81% (very concentrated)",
+            "largest holder 35%",
+            "928 holders"
+          ]
+        },
+        "total": 65,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "GonqZpYyparYcJBxbWHuJiGcPcNJDoZgxGNptLGxpump",
+      "symbol": "TNT",
+      "name": "TNT",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 62,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 62,
+      "peakScoreTotal": 62,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": 6,
+      "aiRiskScore": 4,
+      "lastSkipReason": "total 62 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.00003602095758303475,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 44.80844292492056,
+          "covered": true,
+          "notes": [
+            "LP $15,689",
+            "vol24h $558",
+            "turnover 0.02×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 36,
+          "covered": true,
+          "notes": [
+            "20% buys",
+            "2 insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 28.4480677426101,
+          "covered": true,
+          "notes": [
+            "top10 56% (very concentrated)",
+            "largest holder 25%",
+            "554 holders"
+          ]
+        },
+        "total": 62,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "5eDr7iE1fdwA92sRV938uuCKWUCTYYE12tKzBvtXAoYp",
+      "symbol": "OHHA",
+      "name": "OHHA",
+      "addedAt": "2026-10-06T16:30:45.938Z",
+      "lastCheckedAt": "2026-10-06T16:30:45.938Z",
+      "scoreTotal": 62,
+      "scoreCoverage": 0.8,
+      "priorScoreTotal": null,
+      "peakScoreTotal": 62,
+      "scoreDelta": null,
+      "positiveTrendTicks": 0,
+      "aiGemScore": 3,
+      "aiRiskScore": 9,
+      "lastSkipReason": "total 62 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000028861263047000106,
+      "lastBreakdown": {
+        "security": {
+          "score": 55,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP lock unknown",
+            "no RugCheck score"
+          ]
+        },
+        "liquidity": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "deep LP $276,485",
+            "volume 24h N/A"
+          ]
+        },
+        "moneyFlow": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "no money-flow data"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 25,
+          "covered": true,
+          "notes": [
+            "top10 99% (very concentrated)",
+            "largest holder 96%",
+            "5,211 holders"
+          ]
+        },
+        "total": 62,
+        "coverage": 0.8
+      }
+    },
+    {
+      "mint": "A84yay8MwYM1fjBucEo4NnYNEZ4xeJshktjB6b7CgbQB",
+      "symbol": "EVAN",
+      "name": "The Max Extractor",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 61,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 61,
+      "peakScoreTotal": 62,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 61 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000036335941191329725,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 52.42495677730125,
+          "covered": true,
+          "notes": [
+            "LP $3,708",
+            "vol24h $11,176",
+            "turnover 3.17×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 68.98305084745763,
+          "covered": true,
+          "notes": [
+            "48% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.1,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 98%",
+            "4 holders"
+          ]
+        },
+        "total": 61,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "DfGTRx7xGNDL3BQXtXsMX4z8J6N3rykEtDgVapKapump",
+      "symbol": "DOOMSCROLL",
+      "name": "Doomscroll",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 61,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 61,
+      "peakScoreTotal": 61,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 10,
+      "lastSkipReason": "total 61 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000033816207905177863,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 52.15953511939077,
+          "covered": true,
+          "notes": [
+            "LP $3,623",
+            "vol24h $6,260",
+            "turnover 1.85×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 71.73076923076923,
+          "covered": true,
+          "notes": [
+            "53% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 61,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "7iFiB89BhcgJZrH5FSHdtGPfrM2aUEgxBm9hdEj1hkBS",
+      "symbol": "LAMISERY",
+      "name": "La Misery",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 59,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 59,
+      "peakScoreTotal": 59,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 10,
+      "lastSkipReason": "total 59 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000033705218611008873,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 31.480008279230013,
+          "covered": true,
+          "notes": [
+            "LP $3,583",
+            "volume 24h N/A"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 59,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "Aapk5yV5ym1XLjHLdTq2RRhN5xECMm1hRspewVAUvivo",
+      "symbol": "ELONCHAN",
+      "name": "Elon-chan",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 59,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 59,
+      "peakScoreTotal": 59,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 9,
+      "lastSkipReason": "total 59 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000035199528744223587,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 31.969368399231456,
+          "covered": true,
+          "notes": [
+            "LP $3,693",
+            "volume 24h N/A"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 59,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "9GEUA6pXNmf1c8nujWRoJDq17K8gfMyWBNp5d9cfw8xG",
+      "symbol": "GB",
+      "name": "Gigabyte",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 58,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 58,
+      "peakScoreTotal": 58,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 58 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.00001203765638192329,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 43.62127671830364,
+          "covered": true,
+          "notes": [
+            "LP $11,600",
+            "vol24h $548",
+            "turnover 0.05×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 57.16129032258064,
+          "covered": true,
+          "notes": [
+            "42% buys",
+            "1 insider network"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 3.375,
+          "covered": true,
+          "notes": [
+            "top10 68% (very concentrated)",
+            "largest holder 49%",
+            "135 holders"
+          ]
+        },
+        "total": 58,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "BXofMhwZQd14hbPjJpD1q7AisrRDPtD3VB53rXQbpump",
+      "symbol": "SDI",
+      "name": "Super Duper Inu",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 58,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 58,
+      "peakScoreTotal": 58,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 9,
+      "lastSkipReason": "total 58 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000025151829353969943,
+      "lastBreakdown": {
+        "security": {
+          "score": 90.1,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 48.68950222222222,
+          "covered": true,
+          "notes": [
+            "LP $2,507",
+            "vol24h $57,210",
+            "turnover 22.77×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 88.04448563484708,
+          "covered": true,
+          "notes": [
+            "80% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.575,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "23 holders"
+          ]
+        },
+        "total": 58,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "GSwatwQg12UaRAkYmPcj3ZmzXu8rsYvPwBCwqsob9PSk",
+      "symbol": "{BRACAT}",
+      "name": "{Bracat}",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 58,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 58,
+      "peakScoreTotal": 58,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": 10,
+      "lastSkipReason": "total 58 < 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000002919321600976623,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 29.404429392178752,
+          "covered": true,
+          "notes": [
+            "LP $3,128",
+            "volume 24h N/A",
+            "24h -0.3%"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 58,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "9PR5nRgQYG7DyMddWvaYV9JjL35AMS9jFzSzte37CLAW",
+      "symbol": "TEST",
+      "name": "test",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.00000338367537134636,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 22.18499892886842,
+          "covered": true,
+          "notes": [
+            "LP $3,631",
+            "vol24h $0",
+            "turnover 0.00×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "100% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.05,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "2 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "5yFnjdYmVeWhcDYWEPKA9Rz12V1nADeyrCQoU63kpump",
+      "symbol": "VIBE",
+      "name": "Ministry of Vibes",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000058493358877602615,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 30.65732665986219,
+          "covered": true,
+          "notes": [
+            "LP $4,821",
+            "vol24h $1,424",
+            "turnover 0.24×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 81.66666666666666,
+          "covered": true,
+          "notes": [
+            "69% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.375,
+          "covered": true,
+          "notes": [
+            "top10 95% (very concentrated)",
+            "largest holder 73%",
+            "15 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "A3fy4ggjn2WVvZpTmf88JiJGybiBGyMFpXX1ygvhpump",
+      "symbol": "VTUBER",
+      "name": "Vtuber",
+      "addedAt": "2026-10-06T16:01:34.340Z",
+      "lastCheckedAt": "2026-10-06T16:01:34.340Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000003585032666591503,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 34.81521798289788,
+          "covered": true,
+          "notes": [
+            "LP $3,644",
+            "vol24h $2,141",
+            "turnover 0.63×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 70,
+          "covered": true,
+          "notes": [
+            "50% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "ExSoX8drYCcETr6ryWJXbQiGrwrH3yppntge2QEUGYgD",
+      "symbol": "STARBUCKS",
+      "name": "Starbucks Corporation",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000021373810972785023,
+      "lastBreakdown": {
+        "security": {
+          "score": 89.8,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 47.624786666666665,
+          "covered": true,
+          "notes": [
+            "LP $2,165",
+            "vol24h $116,557",
+            "turnover 54.72×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 72.34400308522947,
+          "covered": true,
+          "notes": [
+            "54% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 1.05,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "42 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "3VYjMs6oUJvy4zw9UpLi7NFFA3cWsty2q9LtdFUEpump",
+      "symbol": "BabyPump",
+      "name": "BabyPump",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000003382244741275484,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 33.926898153458524,
+          "covered": true,
+          "notes": [
+            "LP $3,623",
+            "vol24h $1,987",
+            "turnover 0.59×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 71.57894736842104,
+          "covered": true,
+          "notes": [
+            "53% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.05,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "2 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "6vHfBTBPEFCNaWPAqB11ZoJPp9MNHJEMTZLVB7nVkTjT",
+      "symbol": "Buto",
+      "name": "Buto",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000034551812315368573,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 36.19531027985123,
+          "covered": true,
+          "notes": [
+            "LP $3,614",
+            "vol24h $2,369",
+            "turnover 0.70×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 67,
+          "covered": true,
+          "notes": [
+            "45% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.05,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "2 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "12vHxXGhCmqydjiXDKDjkAsjXpYTr6iiPt4wKKfaAVCn",
+      "symbol": "NORMIE",
+      "name": "Normie Coin",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 56,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 56,
+      "peakScoreTotal": 56,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 56 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.0000032476472435884596,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 23.004088437447653,
+          "covered": true,
+          "notes": [
+            "LP $3,307",
+            "volume 24h N/A",
+            "24h -36.2%"
+          ]
+        },
+        "moneyFlow": {
+          "score": 100,
+          "covered": true,
+          "notes": [
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 56,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "4phKSro7Pn6X1SmSHc6BwXQPCdUaMgCfxsJiK2Pppump",
+      "symbol": "wwl",
+      "name": "world wide launch",
+      "addedAt": "2026-10-06T16:18:01.921Z",
+      "lastCheckedAt": "2026-10-06T16:18:01.921Z",
+      "scoreTotal": 55,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 55,
+      "peakScoreTotal": 55,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 55 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000003356522256700592,
+      "lastBreakdown": {
+        "security": {
+          "score": 99.7,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned"
+          ]
+        },
+        "liquidity": {
+          "score": 32.25280151513896,
+          "covered": true,
+          "notes": [
+            "LP $3,601",
+            "vol24h $1,706",
+            "turnover 0.51×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 68.42105263157895,
+          "covered": true,
+          "notes": [
+            "47% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 0.025,
+          "covered": true,
+          "notes": [
+            "top10 100% (very concentrated)",
+            "largest holder 100%",
+            "1 holders"
+          ]
+        },
+        "total": 55,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "oLQwEjXtFCRReFnX9ePwBZ4Pw3oXX9DDqJCcG7Morun",
+      "symbol": "GIFTED",
+      "name": "gifted.run",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 55,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": 55,
+      "peakScoreTotal": 55,
+      "scoreDelta": 0,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 55 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.000002570288823710643,
+      "lastBreakdown": {
+        "security": {
+          "score": 90.1,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP locked/burned",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 48.867488888888886,
+          "covered": true,
+          "notes": [
+            "LP $2,565",
+            "vol24h $71,397",
+            "turnover 29.53×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 58.18181818181818,
+          "covered": true,
+          "notes": [
+            "44% buys",
+            "1 insider network"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 1.775,
+          "covered": true,
+          "notes": [
+            "top10 99% (very concentrated)",
+            "largest holder 96%",
+            "71 holders"
+          ]
+        },
+        "total": 55,
+        "coverage": 0.9
+      }
+    },
+    {
+      "mint": "fnoskcAEFDXU1mJwHyL2r1nnM5rozLkWtcxrjHtschi",
+      "symbol": "chinapad",
+      "name": "ChinaPad",
+      "addedAt": "2026-10-06T17:55:37.344Z",
+      "lastCheckedAt": "2026-10-06T17:55:37.344Z",
+      "scoreTotal": 55,
+      "scoreCoverage": 0.9,
+      "priorScoreTotal": null,
+      "peakScoreTotal": 55,
+      "scoreDelta": null,
+      "positiveTrendTicks": 0,
+      "aiGemScore": null,
+      "aiRiskScore": null,
+      "lastSkipReason": "total 55 < buy 80",
+      "status": "watching",
+      "aiRescoreReason": null,
+      "lastPriceUsd": 0.00003897632899731873,
+      "lastBreakdown": {
+        "security": {
+          "score": 59.8,
+          "covered": true,
+          "notes": [
+            "mint revoked",
+            "freeze revoked",
+            "LP lock unknown",
+            "Low Liquidity"
+          ]
+        },
+        "liquidity": {
+          "score": 67.15541595490238,
+          "covered": true,
+          "notes": [
+            "LP $8,443",
+            "vol24h $146,881",
+            "turnover 3.95×"
+          ]
+        },
+        "moneyFlow": {
+          "score": 73.16725978647688,
+          "covered": true,
+          "notes": [
+            "55% buys",
+            "no insider networks"
+          ]
+        },
+        "social": {
+          "score": 0,
+          "covered": false,
+          "notes": [
+            "social not tracked yet"
+          ]
+        },
+        "distribution": {
+          "score": 22.129040201891293,
+          "covered": true,
+          "notes": [
+            "top10 47%",
+            "largest holder 24%",
+            "89 holders"
+          ]
+        },
+        "total": 55,
+        "coverage": 0.9
+      }
+    }
+  ],
+  "updatedAt": "2026-10-06T18:05:04.402Z"
+}

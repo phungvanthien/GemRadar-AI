@@ -6,6 +6,10 @@ import { getJupiterPrices } from "@/lib/jupiter";
 import { getDexScreenerData } from "@/lib/dexscreener";
 import { analyzeSolanaGems, type SolanaGemInput } from "@/lib/ai";
 import { computeGemScore } from "@/lib/gem-score";
+import {
+  getAiGemCandidateLimit,
+  selectInputsForAiAnalysis,
+} from "@/lib/gem-ai-prefilter";
 import { getRecentMints } from "@/lib/recent-mints";
 import { getSocialSignalsBulk, upsertWatchlist } from "@/lib/social-store";
 import { shouldTrackSocial, getSocialMonitorConfig } from "@/lib/social-config";
@@ -13,6 +17,8 @@ import { getXProfileMetrics, computeXScore } from "@/lib/x";
 import type { SolanaRugcheckSignal } from "@/lib/types";
 import { maybeEnterPositions } from "@/lib/trade-entry";
 import { recordGemOutcome } from "@/lib/gem-outcomes-store";
+import { writeLiveScanState } from "@/lib/live-scan-store";
+import { ingestWatchCandidatesFromScan } from "@/lib/gem-watch-from-scan";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -55,6 +61,11 @@ export async function POST(request: Request) {
         maxAgeMs: 30 * 60_000,
       });
       if (recent.length === 0) {
+        await writeLiveScanState({
+          status: "idle",
+          updatedAt: new Date().toISOString(),
+          tokens: [],
+        });
         return NextResponse.json({
           gems: [],
           enrichedCount: 0,
@@ -89,6 +100,13 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
+    // Record that we started a scan on these tokens
+    await writeLiveScanState({
+      status: "scanning",
+      updatedAt: new Date().toISOString(),
+      tokens: tokens.map(t => ({ mint: t.mint, symbol: t.symbol, name: t.name || t.symbol })),
+    });
 
     // Health check, RugCheck bulk lookup, and Jupiter prices are independent —
     // run in parallel. The RugCheck bulk report adds LP-lock, insider-network,
@@ -171,6 +189,12 @@ export async function POST(request: Request) {
     });
 
     if (inputs.length === 0) {
+      await writeLiveScanState({
+        status: "error",
+        updatedAt: new Date().toISOString(),
+        tokens: tokens.map(t => ({ mint: t.mint, symbol: t.symbol, name: t.name || t.symbol })),
+        error: "On-chain enrichment failed for all tokens",
+      });
       return NextResponse.json(
         { error: "On-chain enrichment failed for all tokens", failures, source },
         { status: 502 },
@@ -263,22 +287,64 @@ export async function POST(request: Request) {
       }),
     );
 
-    const gems = await analyzeSolanaGems(inputs);
-    const scored = gems.map((g) => ({
-      ...g,
-      breakdown: scoreByMint.get(g.mint) ?? null,
-    }));
+    const aiCandidateLimit = getAiGemCandidateLimit();
+    const aiInputs = selectInputsForAiAnalysis(inputs, scoreByMint, aiCandidateLimit);
+
+    // Update state before AI starts
+    await writeLiveScanState({
+      status: "analyzing",
+      updatedAt: new Date().toISOString(),
+      tokens: tokens.map(t => ({ mint: t.mint, symbol: t.symbol, name: t.name || t.symbol })),
+      enrichedInputs: inputs,
+    });
+
+    if (inputs.length > aiInputs.length) {
+      console.log(
+        `[/api/solana-gems] gem-score pre-filter: ${inputs.length} enriched → ${aiInputs.length} sent to AI (top by total + risk)`,
+      );
+    }
+
+    const gems = await analyzeSolanaGems(aiInputs);
+    const aiByMint = new Map(gems.map((g) => [g.mint, g]));
+
+    const scored = inputs.map((inp) => {
+      const mint = inp.onChain.mint;
+      const breakdown = scoreByMint.get(mint) ?? null;
+      const ai = aiByMint.get(mint);
+      if (ai) {
+        return { ...ai, breakdown, aiAnalyzed: true as const };
+      }
+      return {
+        symbol: inp.symbol,
+        name: inp.name,
+        mint,
+        onChain: inp.onChain,
+        price: inp.price ?? 0,
+        marketCap: inp.marketCap ?? 0,
+        volume24h: inp.volume24h ?? 0,
+        percentChange24h: inp.percentChange24h ?? 0,
+        gemScore: null as number | null,
+        riskScore: null as number | null,
+        potentialUpside: null as string | null,
+        explanation: null as string | null,
+        breakdown,
+        aiAnalyzed: false as const,
+      };
+    });
 
     // Only high-scoring gems get tracked on social — both the AI gemScore and
     // the deterministic total must clear the thresholds in
     // social-monitor.config.json (with enough coverage). This keeps the Telegram
     // worker from joining channels for low-quality tokens.
-    const trackable = scored.filter((g) =>
-      shouldTrackSocial({
-        gemScoreAi: g.gemScore,
-        gemScoreTotal: g.breakdown?.total ?? 0,
-        coverage: g.breakdown?.coverage ?? 0,
-      }),
+    const trackable = scored.filter(
+      (g) =>
+        g.aiAnalyzed &&
+        g.gemScore != null &&
+        shouldTrackSocial({
+          gemScoreAi: g.gemScore,
+          gemScoreTotal: g.breakdown?.total ?? 0,
+          coverage: g.breakdown?.coverage ?? 0,
+        }),
     );
 
     // Resolve each trackable gem's official Telegram and hand the list to the
@@ -317,6 +383,7 @@ export async function POST(request: Request) {
     void (async () => {
       try {
         for (const g of scored) {
+          if (!g.aiAnalyzed || g.gemScore == null || g.riskScore == null) continue;
           await recordGemOutcome({
             mint: g.mint,
             symbol: g.symbol,
@@ -335,9 +402,14 @@ export async function POST(request: Request) {
 
     // Auto-trade entry (dry-run unless the live gate is open). Best-effort: a
     // failure here must never fail the scan response.
+    let entryDecisions: Awaited<ReturnType<typeof maybeEnterPositions>> = [];
     try {
-      const decisions = await maybeEnterPositions(scored);
-      const bought = decisions.filter((d) => d.action === "bought");
+      const aiScoredForTrade = scored.filter(
+        (g): g is typeof g & { aiAnalyzed: true; gemScore: number; riskScore: number } =>
+          g.aiAnalyzed && g.gemScore != null && g.riskScore != null,
+      );
+      entryDecisions = await maybeEnterPositions(aiScoredForTrade);
+      const bought = entryDecisions.filter((d) => d.action === "bought");
       if (bought.length > 0) {
         console.log(
           `[/api/solana-gems] auto-trade: ${bought.map((b) => `${b.symbol}(${b.mode})`).join(", ")}`,
@@ -346,6 +418,28 @@ export async function POST(request: Request) {
     } catch (e) {
       console.error("[/api/solana-gems] auto-trade entry failed:", e);
     }
+
+    try {
+      const { ingestAiHighUnboughtFromScan } = await import(
+        "@/lib/gem-ai-unbought-tracker"
+      );
+      const addedNearMiss = await ingestWatchCandidatesFromScan(scored);
+      const addedAiHigh = await ingestAiHighUnboughtFromScan(scored, entryDecisions);
+      if (addedNearMiss > 0 || addedAiHigh > 0) {
+        console.log(
+          `[/api/solana-gems] watchlist: ${addedNearMiss} near-miss, ${addedAiHigh} AI-high unbought`,
+        );
+      }
+    } catch (e) {
+      console.error("[/api/solana-gems] watchlist ingest failed:", e);
+    }
+
+    await writeLiveScanState({
+      status: "completed",
+      updatedAt: new Date().toISOString(),
+      tokens: tokens.map(t => ({ mint: t.mint, symbol: t.symbol, name: t.name || t.symbol })),
+      results: scored,
+    });
 
     return NextResponse.json({
       gems: scored,
@@ -356,6 +450,17 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("[/api/solana-gems]", error);
     const message = error instanceof Error ? error.message : "Solana gem scan failed";
+
+    // Attempt to write error state, though we might not have 'tokens' in scope here depending on where it failed
+    try {
+      await writeLiveScanState({
+        status: "error",
+        updatedAt: new Date().toISOString(),
+        tokens: [], // empty if we failed early
+        error: message,
+      });
+    } catch (_) {}
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

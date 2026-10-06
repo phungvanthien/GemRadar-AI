@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatPercent } from "@/lib/utils";
 import type { MarketOverview } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface LeftSidebarProps {
   data: MarketOverview | null;
@@ -51,6 +52,8 @@ function TokenRow({
 }
 
 export function LeftSidebar({ data, loading, error }: LeftSidebarProps) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <aside className="flex flex-col gap-4 p-4">
@@ -97,7 +100,7 @@ export function LeftSidebar({ data, loading, error }: LeftSidebarProps) {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-emerald-400">
             <TrendingUp className="size-4" />
-            Top Gainers
+            {t("sidebar.topGainers") || "Top Gainers"}
           </CardTitle>
         </CardHeader>
         <CardContent className="divide-y divide-zinc-800/80">
@@ -117,7 +120,7 @@ export function LeftSidebar({ data, loading, error }: LeftSidebarProps) {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-red-400">
             <TrendingDown className="size-4" />
-            Top Losers
+            {t("sidebar.topLosers") || "Top Losers"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -137,7 +140,7 @@ export function LeftSidebar({ data, loading, error }: LeftSidebarProps) {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2">
             <Gauge className="size-4 text-violet-400" />
-            Fear & Greed
+            {t("sidebar.fearGreed") || "Fear & Greed"}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -156,7 +159,7 @@ export function LeftSidebar({ data, loading, error }: LeftSidebarProps) {
 
       <Separator className="opacity-50" />
       <p className="text-center text-[10px] text-zinc-600">
-        Updated {new Date(data.updatedAt).toLocaleTimeString()}
+        {t("sidebar.updated") || "Updated"} {new Date(data.updatedAt).toLocaleTimeString()}
       </p>
     </aside>
   );

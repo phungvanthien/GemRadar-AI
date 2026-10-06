@@ -9,7 +9,7 @@
 // The manual-hold "moon bag" is never auto-sold: cumulative sold is clamped to
 // (100 - manualHoldPercent).
 
-import type { Position } from "./position-store";
+import type { Position, Fill } from "./position-store";
 import {
   filledTierIds,
   getOpenPositions,
@@ -19,6 +19,9 @@ import {
   reconcileFromChain,
   getTotalRealizedPnlSol,
   computeUnrealizedPnlSol,
+  consecutiveSellFails,
+  isRugSellSignal,
+  writeOffPosition,
 } from "./position-store";
 import { loadMandate } from "./mandate-store";
 import { computeAccounting, shouldForceLiquidate } from "./mandate";
@@ -31,12 +34,24 @@ import {
   type TradeConfig,
 } from "./trade-config";
 import { loadSettings } from "./settings-store";
-import { sell } from "./jupiter-swap";
+import { sell, quotePriceUsd } from "./jupiter-swap";
 import {
   getConnection,
   loadKeypair,
   getTokenBalance,
+  GuardError,
 } from "./trade-wallet";
+
+// Wrapped-SOL mint — the SOL/USD reference for the price-gap fallback. Always
+// present in Jupiter Price v3, unlike the thin memecoins that trigger a gap.
+const WSOL_MINT = "So11111111111111111111111111111111111111112";
+
+// Extract a stable error code from a thrown value for the fill ledger. A
+// GuardError carries its own `code` (e.g. "quote-no-route", "price-impact",
+// "quote-http"); anything else is an unclassified failure.
+function errorCodeOf(e: unknown): string {
+  return e instanceof GuardError ? e.code : "exception";
+}
 
 export interface SellAction {
   // % of the ORIGINAL position to sell on this tick (already clamped to the
@@ -54,6 +69,58 @@ export interface DecideContext {
   currentPriceUsd: number;
   now: Date;
   killSwitch: boolean;
+}
+
+// Consecutive genuine "can't be sold" signals after which a position is written
+// off as a rugpull (no swap route / price impact too high / on-chain reject).
+// consecutiveSellFails already excludes transient infra failures, so three such
+// signals in a row is a token that genuinely can't be sold, not a Jupiter hiccup.
+export const RUGPULL_WRITEOFF_FAILS = 3;
+
+// The most recent sell attempt in the ledger, ignoring reconcile bookkeeping.
+// Used as a final guard before write-off: the LAST attempt must itself be a rug
+// signal, so a transient infra failure landing after an old rug run can't trip a
+// stale write-off.
+function lastSellAttempt(pos: Position): Fill | null {
+  for (let i = pos.fills.length - 1; i >= 0; i--) {
+    const f = pos.fills[i];
+    if (f.kind !== "sell") continue;
+    if (f.reason === "reconcile") continue;
+    return f;
+  }
+  return null;
+}
+
+// If `pos` has hit the rugpull fail threshold, write it off and log it. Returns
+// true when a write-off happened (the caller should stop managing the position).
+//
+// Two guards protect against the false-positive rugpull that closes a healthy
+// position (token still in the wallet, just temporarily unsellable):
+//  1. consecutiveSellFails only counts genuine rug signals, never infra noise.
+//  2. the MOST RECENT attempt must itself be a rug signal — if the latest tick
+//     failed for a transient reason, we hold and retry rather than write off.
+async function maybeWriteOffRugpull(pos: Position, now: Date): Promise<boolean> {
+  if (consecutiveSellFails(pos) < RUGPULL_WRITEOFF_FAILS) return false;
+
+  const last = lastSellAttempt(pos);
+  if (last && !isRugSellSignal(last)) {
+    console.warn(
+      `[trade-exit] write-off DEFERRED for ${pos.symbol}: ${RUGPULL_WRITEOFF_FAILS}+ rug ` +
+        `signals but latest sell failed transiently (${last.errorCode ?? "?"}) — retrying`,
+    );
+    return false;
+  }
+
+  const remainingPct = Math.max(0, 100 - pos.soldPct);
+  const lostSol = pos.entrySol * (remainingPct / 100);
+  const off = await writeOffPosition(pos.id, "rugpull", now);
+  if (off) {
+    console.warn(
+      `[trade-exit] WRITE-OFF ${off.symbol} after ${RUGPULL_WRITEOFF_FAILS} unsellable sells ` +
+        `(rugpull) — booked -${lostSol.toFixed(4)} SOL loss, slot freed`,
+    );
+  }
+  return off != null;
 }
 
 // PURE. Decide the sell for one position this tick. Returns null for "hold".
@@ -181,6 +248,35 @@ export async function monitorPositions(
 
   const prices = await fetchPrices(open.map((p) => p.mint));
 
+  // Price-feed-gap fallback (live only). Jupiter Price API v3 sometimes omits a
+  // mint it still has a swap route for — a transient feed gap, NOT a rug. Left
+  // unhandled, price==null sends a healthy position down the rugpull-probe path
+  // and can get it written off. For each missing mint we derive a price from a
+  // real sell quote (token -> WSOL): quotable here == genuinely sellable, which
+  // is exactly the distinction we need. Needs a signer to produce a live quote.
+  if (live && keypair && connection) {
+    const missing = open.filter((p) => prices.get(p.mint) == null);
+    if (missing.length > 0) {
+      // WSOL is always in Price v3, so this is a reliable SOL/USD reference.
+      const solPrice = (await getJupiterPrices([WSOL_MINT])).get(WSOL_MINT)?.usdPrice;
+      if (solPrice != null && solPrice > 0) {
+        await Promise.all(
+          missing.map(async (p) => {
+            const sellable = p.tokenAmount * Math.max(0, 100 - p.soldPct) / 100;
+            const px = await quotePriceUsd(p.mint, sellable, p.decimals, solPrice, cfg);
+            if (px != null && px > 0) {
+              prices.set(p.mint, px);
+              console.log(
+                `[trade-exit] price-gap fallback: ${p.symbol} not in Price v3, ` +
+                  `derived $${px.toExponential(3)} from sell quote (still sellable)`,
+              );
+            }
+          }),
+        );
+      }
+    }
+  }
+
   // Mandate drawdown check. Now that prices are in hand, compute FULL equity
   // (realized + unrealized) and ask the mandate whether a breach must liquidate.
   // On a breach in "halt-and-liquidate" mode we force the kill-switch path for
@@ -240,7 +336,63 @@ export async function monitorPositions(
     }
 
     const price = prices.get(pos.mint);
-    if (price == null) continue; // no price this tick — hold
+    if (price == null) {
+      // No price from any source. For a healthy token this is a transient feed
+      // gap — hold. But a rugpulled token also goes priceless AND unsellable, so
+      // we probe a sell to let the no-route/price-impact error accrue on the
+      // fail-run; once the run hits the threshold the position is written off.
+      // Live only: a probe needs a signer to produce a real quote/route error.
+      // In dry-run there is no chain to probe, so a priceless position can only
+      // be cleared manually (the dashboard write-off button).
+      if (!(live && keypair && connection)) continue;
+      const probePct = Math.max(0, 100 - pos.soldPct);
+      try {
+        const probeAmount = pos.tokenAmount * (probePct / 100);
+        const { fill } = await sell(
+          pos.mint,
+          probeAmount,
+          pos.decimals,
+          probePct,
+          0,
+          "rugpull-probe",
+          { live, keypair, connection, cfg },
+          now,
+        );
+        // A probe that unexpectedly succeeds is a real sell: record it so soldPct
+        // advances and the position closes if the sellable amount is exhausted.
+        // A non-advancing (errored) fill from the swap layer is recorded too and
+        // feeds the fail-run below.
+        const updated = await recordSellFill(
+          pos.id,
+          fill,
+          { closeReason: "rugpull-probe" },
+          now,
+        );
+        if (updated) await maybeWriteOffRugpull(updated, now);
+        continue;
+      } catch (e) {
+        const updated = await recordSellFill(
+          pos.id,
+          {
+            time: now.toISOString(),
+            kind: "sell",
+            pct: probePct,
+            priceUsd: 0,
+            sol: 0,
+            tokenAmount: 0,
+            txSig: null,
+            dryRun: false,
+            error: e instanceof Error ? e.message : "no-price-sell-failed",
+            errorCode: errorCodeOf(e),
+            reason: "rugpull-probe",
+          },
+          {},
+          now,
+        );
+        if (updated) await maybeWriteOffRugpull(updated, now);
+        continue;
+      }
+    }
 
     // Persist the high-water mark + trailing latch BEFORE deciding, so a crash
     // between here and the sell doesn't lose the peak.
@@ -284,7 +436,7 @@ export async function monitorPositions(
     } catch (e) {
       // Record a failed fill for audit; do NOT advance soldPct (handled by the
       // store when fill.error is set). On the next tick we re-evaluate.
-      await recordSellFill(
+      const updated = await recordSellFill(
         pos.id,
         {
           time: now.toISOString(),
@@ -296,12 +448,19 @@ export async function monitorPositions(
           txSig: null,
           dryRun: !live,
           error: e instanceof Error ? e.message : "sell-failed",
+          errorCode: errorCodeOf(e),
           reason: action.reason,
         },
         {},
         now,
       );
       console.error(`[trade-exit] sell failed for ${pos.symbol}:`, e);
+
+      // Rugpull detection: a token that can't be sold produces a run of errored
+      // sells (no route / price impact too high). After enough consecutive
+      // failures, write the position off as a total loss so its slot + deployed
+      // capital are freed and new entries can open again.
+      if (updated) await maybeWriteOffRugpull(updated, now);
     }
   }
 }
